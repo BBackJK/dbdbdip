@@ -32,8 +32,6 @@ public class AuthRequestFilter extends OncePerRequestFilter{
 			throws ServletException, IOException {
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
-		
-		System.out.println(requestTokenHeader);
 
 		String email = null;
 		String jwtToken = null;
@@ -45,6 +43,7 @@ public class AuthRequestFilter extends OncePerRequestFilter{
 			
 			try {
 				email = jwtTokenUtil.getUsernameFromToken(jwtToken);
+				
 			} catch (IllegalArgumentException e) {
 				System.out.println("Unable to get JWT Token");
 			} catch (ExpiredJwtException e) {
@@ -69,7 +68,6 @@ public class AuthRequestFilter extends OncePerRequestFilter{
 				
 				// Context에서 인증을 설정한 후
 				// 현재 사용자가 인증됨을 나타낸다. 즉, Spring 보안 구성이 완료되었음을 알린다.
-				
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 			}
 		}
