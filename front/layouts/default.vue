@@ -35,24 +35,23 @@
       </nuxt-link>
       <v-spacer />
       <v-btn v-if="!userInfo">
-        <nuxt-link to='/signin' class="signin-link">
+        <nuxt-link to="/signin" class="signin-link">
           <div class="signin-text">
             Sign In
           </div>
         </nuxt-link>
       </v-btn>
       <v-btn v-if="userInfo">
-        <nuxt-link to='/mypage' class="signin-link">
+        <nuxt-link to="/mypage" class="signin-link">
           <div class="signin-text">
-            {{userInfo.email}} ( {{ userInfo.name }} )
+            {{ userInfo.email }} ( {{ userInfo.name }} )
           </div>
         </nuxt-link>
       </v-btn>
     </v-app-bar>
     <v-main>
       <v-container>
-        {{userInfo}}
-        <nuxt/>
+        <nuxt />
       </v-container>
     </v-main>
     <v-footer :absolute="!fixed" app>
@@ -70,7 +69,7 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
-      loginStatus: "SignIn",
+      loginStatus: 'SignIn',
       items: [
         {
           icon: 'mdi-apps',
@@ -85,23 +84,22 @@ export default {
       ],
       miniVariant: false,
       title: 'dbdbdip',
-    }
+    };
   },
   computed: {
     ...mapState({
-      userInfo: state => state.auth.userInfo
-    })
+      userInfo: (state) => state.auth.userInfo,
+    }),
   },
   mounted() {
     const { accessToken } = localStorage;
     console.log(accessToken);
-  }
-}
+  },
+};
 </script>
 
-
 <style>
-.signin-link{
+.signin-link {
   text-decoration: none;
 }
 
@@ -109,10 +107,10 @@ export default {
   text-decoration: none;
 }
 .signin-text {
-  color : white;
+  color: white;
 }
 
 .title-text {
-  color:white;
+  color: white;
 }
 </style>

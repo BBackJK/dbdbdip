@@ -1,95 +1,74 @@
 <template>
-    <div class="container">
-      <form>
-        <v-text-field
-          v-model="email"
-          :error-messages="emailErrors"
-          label="E-mail"
-          ref="email"
-          required
-          @input="$v.email.$touch()"
-          @blur="$v.email.$touch()"
-        ></v-text-field>
-        <v-text-field
-          v-model="password"
-          :error-messages="passwordErrors"
-          :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="show ? 'text' : 'password'"
-          label="Password"
-          required
-          @input="$v.password.$touch()"
-          @blur="$v.password.$touch()"
-          @click:append="show = !show"
-        ></v-text-field>
-        <br/>
-        <v-btn class="mr-4" @click="loginSubmit">submit</v-btn>
-        <v-btn @click="loginClear">clear</v-btn>
-        <br/>
-        <br/>
-        <nuxt-link to='signup' class="signup-link"><span class="signup-text">Not Family? Go Sign Up</span></nuxt-link>
+  <div class="container">
+    <form>
+      <v-text-field
+        v-model="email"
+        :error-messages="emailErrors"
+        label="E-mail"
+        ref="email"
+        required
+        @input="$v.email.$touch()"
+        @blur="$v.email.$touch()"
+      ></v-text-field>
+      <v-text-field
+        v-model="password"
+        :error-messages="passwordErrors"
+        :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="show ? 'text' : 'password'"
+        label="Password"
+        required
+        @input="$v.password.$touch()"
+        @blur="$v.password.$touch()"
+        @click:append="show = !show"
+      ></v-text-field>
+      <br />
+      <v-btn class="mr-4" @click="loginSubmit">submit</v-btn>
+      <v-btn @click="loginClear">clear</v-btn>
+      <br />
+      <br />
+      <nuxt-link to="signup" class="signup-link"
+        ><span class="signup-text">Not Family? Go Sign Up</span></nuxt-link
+      >
 
-        <v-snackbar 
-        v-model="snackbar" 
-        :top="true">
-      Checking Email and Password !
+      <v-snackbar v-model="snackbar" :top="true">
+        Checking Email and Password !
 
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="blue"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-
-    <v-dialog
-      v-model="dialog"
-      max-width="290"
-    >
-      <v-card>
-        <v-card-title class="headline">Success!</v-card-title>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            color="green darken-1"
-            text
-            @click="onSuccessSignIn"
-          >
-            Go Home!
+        <template v-slot:action="{ attrs }">
+          <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
+            Close
           </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-      </form>
-    </div>
+        </template>
+      </v-snackbar>
+
+      <v-dialog v-model="dialog" max-width="290">
+        <v-card>
+          <v-card-title class="headline">Success!</v-card-title>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn color="green darken-1" text @click="onSuccessSignIn">
+              Go Home!
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </form>
+  </div>
 </template>
 
 <script>
-import axios from 'axios';
-import { validationMixin } from 'vuelidate'
-import { required, minLength, email } from 'vuelidate/lib/validators'
-import  { mapState } from 'vuex'; 
+import { validationMixin } from 'vuelidate';
+import { required, minLength, email } from 'vuelidate/lib/validators';
+import { mapState } from 'vuex';
 
 export default {
   mixins: [validationMixin],
 
   validations: {
-    password: { 
-      required, 
+    password: {
+      required,
       minLength: minLength(6),
-      valid: (value) => {
-        const containsHangul = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(value)
-        const containsAlphabat = /[a-z]/.test(value);
-        const containsNumber = /[0-9]/.test(value);
-        const containsSpecial = /[!@#$%^&*()]/.test(value);
-
-        return (containsHangul || containsAlphabat) && containsNumber && containsSpecial;
-      }
     },
     email: { required, email },
   },
@@ -104,25 +83,24 @@ export default {
 
   computed: {
     ...mapState({
-      userInfo: state => state.auth.userInfo,
-      accessToken: state => state.auth.accessToken,
-      message: state => state.auth.message,
-      loggedIn: state => state.auth.message,
+      userInfo: (state) => state.auth.userInfo,
+      accessToken: (state) => state.auth.accessToken,
+      message: (state) => state.auth.message,
+      loggedIn: (state) => state.auth.message,
     }),
-    passwordErrors () {
+    passwordErrors() {
       const errors = [];
 
       if (!this.$v.password.$dirty) return errors;
 
-      !this.$v.password.valid && errors.push('Password contains alpabat and number and special characters!');
-
-      !this.$v.password.minLength && errors.push('Password is 6 characters at least.');
+      !this.$v.password.minLength &&
+        errors.push('Password is 6 characters at least.');
 
       !this.$v.password.required && errors.push('Name is required.');
 
       return errors;
     },
-    emailErrors () {
+    emailErrors() {
       const errors = [];
 
       if (!this.$v.email.$dirty) return errors;
@@ -136,19 +114,21 @@ export default {
   },
 
   methods: {
-    async loginSubmit () {
+    async loginSubmit() {
       this.$v.$touch();
       const data = {
-        email : this.email,
-        password : this.password
+        email: this.email,
+        password: this.password,
       };
 
       await this.$store.dispatch('auth/login', data);
 
-      this.message === "Unauthorized" ? this.snackbar = true : this.dialog = true;
+      this.message === 'Unauthorized'
+        ? (this.snackbar = true)
+        : (this.dialog = true);
     },
 
-    loginClear () {
+    loginClear() {
       this.$v.$reset();
       this.password = '';
       this.email = '';
@@ -159,9 +139,9 @@ export default {
       this.password = '';
       this.email = '';
       this.$router.push('/');
-    }
+    },
   },
-}
+};
 </script>
 
 <style>

@@ -1,56 +1,58 @@
 export const state = () => ({
   userInfo: null,
-  message : null,
-  loggedIn : false,
-})
+  message: null,
+  loggedIn: false,
+});
 
 export const mutations = {
-  LOGIN_SUCCESS (state, data) {
+  LOGIN_SUCCESS(state, data) {
     state.message = data.message;
     state.userInfo = data.userInfo;
     state.loggedIn = true;
   },
-  LOGIN_FAILURE (state, data) {
+  LOGIN_FAILURE(state, data) {
     state.loggedIn = false;
     state.message = data.message;
     state.userInfo = null;
   },
   LOGOUT_SUCCESS(state) {
-    state.loggedIn = false; 
+    state.loggedIn = false;
     state.userInfo = null;
   },
-}
+};
 
 export const actions = {
   async login({ commit }, loginData) {
-    await this.$axios.post('/auth/login', loginData)
+    await this.$axios
+      .post('/auth/login', loginData)
       .then((res) => {
-        
+        console.log(res);
         localStorage.accessToken = res.data.data.token;
         const data = {
-          message: "success",
+          message: 'success',
           userInfo: res.data.data.user,
-        }
+        };
         commit('LOGIN_SUCCESS', data);
       })
-      .catch((err) => { 
-        const data = {}
+      .catch((err) => {
+        console.log(err);
+        const data = {};
 
         if (err.response.status === 401) {
-          data.message = "Unauthorized";
+          data.message = 'Unauthorized';
           commit('LOGIN_FAILURE', data);
 
-          return ;
+          return;
         }
 
-        data.message = "Unknown Error";
+        data.message = 'Unknown Error';
         commit('LOGIN_FAILURE', data);
-      })
+      });
   },
   logout({ commit }) {
     commit('LOGOUT_SUCCESS');
-  }
-}
+  },
+};
 
 export const getters = {
   getAccessToken(state) {
@@ -64,5 +66,5 @@ export const getters = {
   },
   getLoggedIn(state) {
     return state.loggedIn;
-  }
-}
+  },
+};

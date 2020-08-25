@@ -1,76 +1,77 @@
 export const state = () => ({
-    message: null,
-    signedUp: false,
-    userTokenInfo: null,
-    gettingUser: false,
-})
-
+  message: null,
+  signedUp: false,
+  userTokenInfo: null,
+  gettingUser: false,
+});
 
 export const mutations = {
-  SIGNUP_SUCCESS (state, data) {
+  SIGNUP_SUCCESS(state, data) {
     state.signedUp = true;
     state.message = data.message;
   },
-  SIGNUP_FAILURE (state, data) {
+  SIGNUP_FAILURE(state, data) {
     state.signedUp = false;
     state.message = data.message;
   },
-  GET_USER_INFO_SUCCESS (state, data) {
+  GET_USER_INFO_SUCCESS(state, data) {
     state.userTokenInfo = data.userInfo;
     state.message = data.message;
-    gettingUser = true;
+    state.gettingUser = true;
   },
-  GET_USER_INFO_FAILURE (state, data) {
+  GET_USER_INFO_FAILURE(state, data) {
     state.userTokenInfo = null;
     state.message = data.message;
-    gettingUser = false;
-  }
-}
+    state.gettingUser = false;
+  },
+};
 
 export const actions = {
-  async signup({commit}, registerData) {
-    await this.$axios.post('/user/register', registerData)
-      .then(res => {
+  async signup({ commit }, registerData) {
+    await this.$axios
+      .post('/user/register', registerData)
+      .then((res) => {
+        console.log(res);
         const data = {};
 
         if (res.data.code === 409) {
-          data.message = "Conflict";
+          data.message = 'Conflict';
           commit('SIGNUP_FAILURE', data);
-          return ;
+          return;
         }
-        
-        data.message = "success";
-        commit("SIGNUP_SUCCESS", data);
+
+        data.message = 'success';
+        commit('SIGNUP_SUCCESS', data);
       })
-      .catch(err => {
+      .catch((err) => {
         const data = {};
 
-        data.message = "Unknown Error";
+        data.message = err.message;
         commit('SIGNUP_FAILURE', data);
-      })
+      });
   },
   getUserInfo({ commit }, paramData) {
-    return this.$axios.get('/user/info', {
-      params : {
-        email: paramData
-      }
-    })
-      .then(res => {
+    return this.$axios
+      .get('/user/info', {
+        params: {
+          email: paramData,
+        },
+      })
+      .then((res) => {
         const data = {};
 
-        data.message = "success";
+        data.message = 'success';
         data.userInfo = res.data.data.user;
 
         commit('GET_USER_INFO_SUCCESS', data);
 
         return res.data.data.user;
       })
-      .catch(err => {
-
+      .catch((err) => {
         const data = {};
 
-        data.message = "Unknown Error";
-        commit('GET_USER_INFO_FAILURE', data)
-      })
-  }
-}
+        data.message = err.message;
+        commit('GET_USER_INFO_FAILURE', data);
+      });
+  },
+};

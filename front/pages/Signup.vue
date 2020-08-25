@@ -64,90 +64,78 @@
         @input="$v.address.$touch()"
         @blur="$v.address.$touch()"
       ></v-text-field>
-      <br/>
+      <br />
       <v-btn class="mr-4" @click="signupSubmit">submit</v-btn>
       <v-btn @click="signupClear">clear</v-btn>
 
-      <v-snackbar 
-        v-model="snackbar" 
-        :top="true">
-      Already Exist Email !!
+      <v-snackbar v-model="snackbar" :top="true">
+        Already Exist Email !!
 
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="blue"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-
-    <v-dialog
-      v-model="dialog"
-      max-width="290"
-    >
-      <v-card>
-        <v-card-title class="headline">Success!</v-card-title>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            color="green darken-1"
-            text
-            @click="onSuccessSignUp"
-          >
-            Go Sign In!
+        <template v-slot:action="{ attrs }">
+          <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
+            Close
           </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        </template>
+      </v-snackbar>
+
+      <v-dialog v-model="dialog" max-width="290">
+        <v-card>
+          <v-card-title class="headline">Success!</v-card-title>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn color="green darken-1" text @click="onSuccessSignUp">
+              Go Sign In!
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </form>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import { validationMixin } from 'vuelidate'
-import { required, minLength, email, sameAs } from 'vuelidate/lib/validators'
+import { validationMixin } from 'vuelidate';
+import { required, minLength, email, sameAs } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
 
 export default {
-
   mixins: [validationMixin],
 
   validations: {
-    password: { 
-      required, 
+    password: {
+      required,
       minLength: minLength(6),
       valid: (value) => {
-        const containsHangul = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(value)
+        const containsHangul = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(value);
         const containsAlphabat = /[a-z]/.test(value);
         const containsNumber = /[0-9]/.test(value);
         const containsSpecial = /[!@#$%^&*()]/.test(value);
 
-        return (containsHangul || containsAlphabat) && containsNumber && containsSpecial;
-      }
+        return (
+          (containsHangul || containsAlphabat) &&
+          containsNumber &&
+          containsSpecial
+        );
+      },
     },
     passwordCheck: {
-      required, 
-      sameAsPassword: sameAs('password')
+      required,
+      sameAsPassword: sameAs('password'),
     },
     email: { required, email },
     name: { required },
-    zipcode : { required },
-    address : { required },
-    phone : {
+    zipcode: { required },
+    address: { required },
+    phone: {
       required,
       valid: (v) => {
         const phoneValid = /010[0-9]/.test(v);
 
         return phoneValid;
-      }
-    }
+      },
+    },
   },
 
   data() {
@@ -162,40 +150,45 @@ export default {
       address: 'adasa',
       snackbar: false,
       dialog: false,
-    }
+    };
   },
 
   computed: {
     ...mapState({
-      signedUp: state => state.user.signedUp
+      signedUp: (state) => state.user.signedUp,
     }),
-    passwordCheckErrors () {
+    passwordCheckErrors() {
       const errors = [];
 
       if (!this.$v.passwordCheck.$dirty) return errors;
 
-      !this.$v.passwordCheck.sameAsPassword && errors.push('Must same password!');
+      !this.$v.passwordCheck.sameAsPassword &&
+        errors.push('Must same password!');
 
-      !this.$v.passwordCheck.required && errors.push('Password Check is required.');
+      !this.$v.passwordCheck.required &&
+        errors.push('Password Check is required.');
 
       return errors;
     },
 
-    passwordErrors () {
+    passwordErrors() {
       const errors = [];
 
       if (!this.$v.password.$dirty) return errors;
 
-      !this.$v.password.valid && errors.push('Password contains alpabat and number and special characters!');
+      !this.$v.password.valid &&
+        errors.push(
+          'Password contains alpabat and number and special characters!'
+        );
 
-      !this.$v.password.minLength && errors.push('Password is 6 characters at least.');
+      !this.$v.password.minLength &&
+        errors.push('Password is 6 characters at least.');
 
       !this.$v.password.required && errors.push('Name is required.');
 
       return errors;
     },
-    emailErrors () {
-
+    emailErrors() {
       const errors = [];
 
       if (!this.$v.email.$dirty) return errors;
@@ -206,7 +199,7 @@ export default {
 
       return errors;
     },
-    nameErrors () {
+    nameErrors() {
       const errors = [];
 
       if (!this.$v.name.$dirty) return errors;
@@ -215,7 +208,7 @@ export default {
 
       return errors;
     },
-    zipcodeErrors () {
+    zipcodeErrors() {
       const errors = [];
 
       if (!this.$v.zipcode.$dirty) return errors;
@@ -224,7 +217,7 @@ export default {
 
       return errors;
     },
-    addressErrors () {
+    addressErrors() {
       const errors = [];
 
       if (!this.$v.address.$dirty) return errors;
@@ -233,7 +226,7 @@ export default {
 
       return errors;
     },
-    phoneErrors () {
+    phoneErrors() {
       const errors = [];
 
       if (!this.$v.phone.$dirty) return errors;
@@ -242,30 +235,31 @@ export default {
 
       !this.$v.phone.required && errors.push('phone is required');
 
-      return errors;     
-    }
+      return errors;
+    },
   },
 
   methods: {
     async signupSubmit() {
-
       this.$v.$touch();
 
       const postData = {
-        name : this.name,
-        password : this.password,
-        email : this.email,
-        phone : this.phone,
-        zipcode : this.zipcode,
-        address : this.address
+        name: this.name,
+        password: this.password,
+        email: this.email,
+        phone: this.phone,
+        zipcode: this.zipcode,
+        address: this.address,
       };
 
       await this.$store.dispatch('user/signup', postData);
 
-      this.signedUp ? this.dialog = true : (this.$refs.email.focus(), this.snackbar = true);
-
+      // eslint-disable-next-line no-unused-expressions
+      this.signedUp
+        ? (this.dialog = true)
+        : (this.$refs.email.focus(), (this.snackbar = true));
     },
-    signupClear () {
+    signupClear() {
       this.$v.$reset();
       this.name = '';
       this.passwordCheck = '';
@@ -279,7 +273,7 @@ export default {
     onSuccessSignUp() {
       this.dialog = false;
       this.snackbar = false;
-      this.$router.push('/signin')
+      this.$router.push('/signin');
       this.$v.$reset();
       this.name = '';
       this.passwordCheck = '';
@@ -288,11 +282,9 @@ export default {
       this.phone = '';
       this.zipcode = '';
       this.address = '';
-    }
-  }
-}
-
-
+    },
+  },
+};
 </script>
 
 <style>
