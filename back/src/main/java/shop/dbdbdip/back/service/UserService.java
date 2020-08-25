@@ -1,13 +1,21 @@
 package shop.dbdbdip.back.service;
 
-import shop.dbdbdip.back.model.user.UserPostDto;
-import shop.dbdbdip.back.model.user.UserResponseDto;
+import shop.dbdbdip.back.dto.user.UserPostDto;
+import shop.dbdbdip.back.dto.user.UserResponseDto;
+import shop.dbdbdip.back.dto.user.UserUpdateDto;
+import shop.dbdbdip.back.dto.user.UserUpdatePasswordDto;
 
 public interface UserService {
-
-	int postUser(UserPostDto user);
 	
-	UserResponseDto getUserById(int id);
+	UserResponseDto readUserById(int id);
 	
-	UserResponseDto getUserByEmail(String email);
-}
+	UserResponseDto readUserByEmail(String email);
+	
+	int createUser(UserPostDto user);
+	
+	int updateUser(UserUpdateDto user);
+	
+	int updateUserPassword(UserUpdatePasswordDto user);
+	
+	int deleteUser(String email);
+}	

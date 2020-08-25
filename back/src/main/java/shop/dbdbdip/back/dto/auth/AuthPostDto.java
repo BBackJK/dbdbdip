@@ -1,4 +1,4 @@
-package shop.dbdbdip.back.model.auth;
+package shop.dbdbdip.back.dto.auth;
 
 public class AuthPostDto {
 	

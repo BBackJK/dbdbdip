@@ -5,7 +5,7 @@
 		
 <mapper namespace="shop.dbdbdip.back.mapper.UserMapper">
 		
-	<resultMap type="UserResponseDto" id="UserResultMap">
+	<resultMap type="UserResponseModel" id="UserResultMap">
 		<result property="id" column="id" />
 		<result property="email" column="email" />
 		<result property="phone" column="phone" />
@@ -37,33 +37,60 @@
 		FROM 
 			user
 		WHERE
-			id = #{id} 
+			id = #{id} and deletedAt is null
 	</select>
 	
-	<select id="findByEmail" parameterType="String" resultMap="UserModelResultMap">
+	<select id="getByEmail" parameterType="String" resultMap="UserModelResultMap">
 		SELECT 
 			* 
 		FROM 
 			user
 		WHERE
-			email = #{email} 
+			email = #{email} and deletedAt is null
 	</select>
 	
-	<select id="findByEmailNoPassword" parameterType="String" resultMap="UserResultMap">
+	<select id="getByEmailNoPassword" parameterType="String" resultMap="UserResultMap">
 		SELECT 
 			* 
 		FROM 
 			user
 		WHERE
-			email = #{email} 
+			email = #{email} and deletedAt is null
 	</select>
 
 	
-	<insert id="saveUser" parameterType="UserPostDto">
+	<insert id="postUser" parameterType="UserCreateModel">
 		INSERT INTO
 			user 
 			(email, name, phone, password, zipcode, address) 
 		VALUES 
 			(#{email}, #{name},  #{phone}, #{password}, #{zipcode}, #{address})
 	</insert>
+	
+	<update id="putUser" parameterType="UserUpdateModel">
+		UPDATE 
+			user
+		SET 
+			name = #{name}, phone = #{phone}, zipcode = #{zipcode}, address = #{address}, updatedAt = #{updatedAt}
+		WHERE
+			email = #{email} and deletedAt is null
+	</update>
+	
+	<update id="putUserPassword" parameterType="UserUpdatePasswordModel" >
+		UPDATE 
+			user
+		SET 
+			password = #{password}, updatedAt = #{updatedAt}
+		WHERE
+			email = #{email} and deletedAt is null
+	</update>
+	
+	<update id="deleteUser" parameterType="UserDeleteModel">
+		UPDATE 
+			user
+		set 
+			deletedAt = #{deletedAt}
+		WHERE
+			email = #{email} and deletedAt is null
+	</update>
 </mapper>		

@@ -1,5 +1,8 @@
 package shop.dbdbdip.back.controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import shop.dbdbdip.back.config.AuthRequestFilter;
 import shop.dbdbdip.back.config.JwtTokenUtil;
 import shop.dbdbdip.back.dto.ResponseMessage;
-import shop.dbdbdip.back.model.auth.AuthPostDto;
-import shop.dbdbdip.back.model.user.UserResponseDto;
+import shop.dbdbdip.back.dto.auth.AuthPostDto;
+import shop.dbdbdip.back.dto.user.UserResponseDto;
 import shop.dbdbdip.back.service.UserServiceImpl;
 
 @RestController
@@ -31,6 +35,9 @@ public class AuthController {
 	private JwtTokenUtil jwtTokenUtil;
 	
 	@Autowired
+	private AuthRequestFilter authFilter;
+	
+	@Autowired
 	private UserServiceImpl userService;
 	
 	@RequestMapping(value= "/login", method=RequestMethod.POST)
@@ -42,7 +49,7 @@ public class AuthController {
 		
 		final String token = jwtTokenUtil.generateToken(userDetails);
 		
-		UserResponseDto userInfo = userService.getUserByEmail(authDto.getEmail());
+		UserResponseDto userInfo = userService.readUserByEmail(authDto.getEmail());
 		
 		ResponseMessage message = new ResponseMessage(HttpStatus.OK);
 		
@@ -50,6 +57,20 @@ public class AuthController {
 		message.add("token", token);
 		
 		return message;
+	}
+	
+	@RequestMapping(value="/me", method=RequestMethod.GET)
+	public ResponseMessage getUserByEmail(HttpServletRequest request, HttpServletResponse response) {
+		
+		String email = authFilter.doFilterInternal(request, response);
+		
+		UserResponseDto user = userService.readUserByEmail(email);
+		
+		ResponseMessage message = new ResponseMessage(HttpStatus.OK);
+		
+		message.add("user", user);
+		
+		return message;				
 	}
 	
 	private void auth(String email, String password) throws Exception {

@@ -1,19 +1,26 @@
-package shop.dbdbdip.back.model.auth;
+package shop.dbdbdip.back.dto.user;
 
 import java.util.Date;
 
-public class AuthResponseDto {
+public class UserResponseDto {
 	
 	private int id;
 	private String email;
-	private String token;
-	private String name;
 	private String phone;
+	private String name;
 	private String zipcode;
 	private String address;
 	private Date createdAt;
 	private Date updatedAt;
 	private Date deletedAt;
+	
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public int getId() {
 		return id;
 	}
@@ -25,18 +32,6 @@ public class AuthResponseDto {
 	}
 	public void setEmail(String email) {
 		this.email = email;
-	}
-	public String getToken() {
-		return token;
-	}
-	public void setToken(String token) {
-		this.token = token;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
 	}
 	public String getPhone() {
 		return phone;
@@ -74,5 +69,6 @@ public class AuthResponseDto {
 	public void setDeletedAt(Date deletedAt) {
 		this.deletedAt = deletedAt;
 	}
-
+	
+	
 }

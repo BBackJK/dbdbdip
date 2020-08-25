@@ -1,4 +1,4 @@
-package shop.dbdbdip.back.model;
+package shop.dbdbdip.back.model.user;
 
 import java.util.Date;
 

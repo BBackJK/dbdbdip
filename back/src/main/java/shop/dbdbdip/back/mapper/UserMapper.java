@@ -1,17 +1,25 @@
 package shop.dbdbdip.back.mapper;
 
-import shop.dbdbdip.back.model.UserModel;
-import shop.dbdbdip.back.model.user.UserPostDto;
-import shop.dbdbdip.back.model.user.UserResponseDto;
+import shop.dbdbdip.back.model.user.UserCreateModel;
+import shop.dbdbdip.back.model.user.UserDeleteModel;
+import shop.dbdbdip.back.model.user.UserModel;
+import shop.dbdbdip.back.model.user.UserResponseModel;
+import shop.dbdbdip.back.model.user.UserUpdateModel;
+import shop.dbdbdip.back.model.user.UserUpdatePasswordModel;
 
 public interface UserMapper {
 	
-	UserResponseDto getById(int id);
+	UserResponseModel getById(int id);
 	
-	UserModel findByEmail(String email);
+	UserModel getByEmail(String email);
 	
-	UserResponseDto findByEmailNoPassword(String email);
+	UserResponseModel getByEmailNoPassword(String email);
 	
-	int saveUser(UserPostDto user);
+	int postUser(UserCreateModel user);
 	
+	int putUser(UserUpdateModel user);
+	
+	int putUserPassword(UserUpdatePasswordModel user);
+	
+	int deleteUser(UserDeleteModel user);
 }

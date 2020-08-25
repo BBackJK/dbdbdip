@@ -2,7 +2,7 @@ package shop.dbdbdip.back.model.user;
 
 import java.util.Date;
 
-public class UserResponseDto {
+public class UserResponseModel {
 	
 	private int id;
 	private String email;
