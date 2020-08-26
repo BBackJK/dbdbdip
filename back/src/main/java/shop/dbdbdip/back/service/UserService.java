@@ -4,6 +4,7 @@ import shop.dbdbdip.back.dto.user.UserPostDto;
 import shop.dbdbdip.back.dto.user.UserResponseDto;
 import shop.dbdbdip.back.dto.user.UserUpdateDto;
 import shop.dbdbdip.back.dto.user.UserUpdatePasswordDto;
+import shop.dbdbdip.back.model.user.UserResponseModel;
 
 public interface UserService {
 	
@@ -13,9 +14,9 @@ public interface UserService {
 	
 	int createUser(UserPostDto user);
 	
-	int updateUser(UserUpdateDto user);
+	UserResponseModel updateUser(UserUpdateDto user);
 	
-	int updateUserPassword(UserUpdatePasswordDto user);
+	UserResponseModel updateUserPassword(UserUpdatePasswordDto user);
 	
 	int deleteUser(String email);
 }	

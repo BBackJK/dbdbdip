@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import shop.dbdbdip.back.config.AuthRequestFilter;
 import shop.dbdbdip.back.dto.ResponseMessage;
 import shop.dbdbdip.back.dto.user.UserPostDto;
 import shop.dbdbdip.back.dto.user.UserResponseDto;
 import shop.dbdbdip.back.dto.user.UserUpdateDto;
 import shop.dbdbdip.back.dto.user.UserUpdatePasswordDto;
+import shop.dbdbdip.back.model.user.UserResponseModel;
 import shop.dbdbdip.back.service.UserService;
-import shop.dbdbdip.back.config.AuthRequestFilter;
 
 @RestController
 @CrossOrigin
@@ -62,15 +63,17 @@ public class UserController {
 	@RequestMapping(method=RequestMethod.PUT)
 	public ResponseMessage update(@RequestBody UserUpdateDto user) {
 		
-		int result = userService.updateUser(user);
+		UserResponseModel result = userService.updateUser(user);
 		
-		if (result != 1) {
+		if (result == null) {
 			ResponseMessage message = new ResponseMessage(HttpStatus.CONFLICT);
 			
 			return message;
 		}
 		
 		ResponseMessage message = new ResponseMessage(HttpStatus.OK);
+		
+		message.add("user", result);
 		
 		return message;
 	}
@@ -78,9 +81,9 @@ public class UserController {
 	@RequestMapping(value="/password", method=RequestMethod.PUT)
 	public ResponseMessage updatePassword(@RequestBody UserUpdatePasswordDto user) {
 		
-		int result = userService.updateUserPassword(user);
+		UserResponseModel result = userService.updateUserPassword(user);
 		
-		if (result != 1) {
+		if (result == null) {
 			ResponseMessage message = new ResponseMessage(HttpStatus.CONFLICT);
 			
 			return message;
@@ -88,10 +91,12 @@ public class UserController {
 		
 		ResponseMessage message = new ResponseMessage(HttpStatus.OK);
 		
+		message.add("user", result);
+		
 		return message;
 	}
 	
-	@RequestMapping(method=RequestMethod.DELETE)
+	@RequestMapping(value="/remove",method=RequestMethod.DELETE)
 	public ResponseMessage delete(HttpServletRequest request, HttpServletResponse response) {
 		
 		String email = authFilter.doFilterInternal(request, response);

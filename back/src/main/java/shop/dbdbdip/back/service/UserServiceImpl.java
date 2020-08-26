@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 	
 	@Override
-	public int updateUser(UserUpdateDto user) {
+	public UserResponseModel updateUser(UserUpdateDto user) {
 		
 		UserUpdateModel update = new UserUpdateModel();
 		
@@ -109,17 +109,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		
 		int result = userMapper.putUser(update);
 		
-		return result;
+		if (result != 1) {
+			return null;
+		}
+		
+		UserResponseModel updatedUser = userMapper.getByEmailNoPassword(user.getEmail());
+		
+		return updatedUser;		
 	}
 
 	@Override
-	public int updateUserPassword(UserUpdatePasswordDto user) {
+	public UserResponseModel updateUserPassword(UserUpdatePasswordDto user) {
 		
 		UserModel checkUser = userMapper.getByEmail(user.getEmail());
 		
 		Boolean check = bcryptEncoder.matches(user.getOldPassword(), checkUser.getPassword());
 		
-		if (!check) return 0;
+		if (!check) return null;
 		
 		UserUpdatePasswordModel update = new UserUpdatePasswordModel();
 		
@@ -129,7 +135,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		
 		int result = userMapper.putUserPassword(update);
 				
-		return result;
+		if (result != 1) {
+			return null;
+		}
+		
+		UserResponseModel updatedUser = userMapper.getByEmailNoPassword(user.getEmail());
+		
+		return updatedUser;
 	}
 	
 	@Override

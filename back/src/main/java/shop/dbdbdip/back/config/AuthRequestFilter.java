@@ -30,7 +30,7 @@ public class AuthRequestFilter extends OncePerRequestFilter{
 	public String doFilterInternal(HttpServletRequest request, HttpServletResponse response) {
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
-
+		
 		String email = null;
 		String jwtToken = null;
 		
@@ -78,7 +78,7 @@ public class AuthRequestFilter extends OncePerRequestFilter{
 			throws ServletException, IOException {
 		
 		final String requestTokenHeader = request.getHeader("Authorization");
-
+		
 		String email = null;
 		String jwtToken = null;
 		
