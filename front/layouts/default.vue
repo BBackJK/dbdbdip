@@ -1,20 +1,8 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      fixed
-      app
-    >
+    <v-navigation-drawer v-model="drawer" :mini-variant="false" :clipped="clipped" fixed app>
       <v-list>
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
-        >
+        <v-list-item v-for="(item, i) in items" :key="i" :to="item.to" router exact>
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
@@ -32,38 +20,71 @@
         </v-toolbar-title>
       </nuxt-link>
       <v-spacer />
-      <v-btn v-if="!userInfo">
+      <v-menu v-if="admin" offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn dark v-bind="attrs" v-on="on">
+            <div class="text-set">ADMIN</div>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item>
+            <v-btn text>
+              <nuxt-link to="/admin/product" class="link-set">
+                <div class="text-set">PRODUCT MANAGE</div>
+              </nuxt-link>
+            </v-btn>
+          </v-list-item>
+          <v-list-item>
+            <v-btn text>
+              <nuxt-link to="/admin/board" class="link-set">
+                <div class="text-set">BOARD MANAGE</div>
+              </nuxt-link>
+            </v-btn>
+          </v-list-item>
+          <v-list-item>
+            <v-btn text>
+              <nuxt-link to="/admin/user" class="link-set">
+                <div class="text-set">USER MANAGE</div>
+              </nuxt-link>
+            </v-btn>
+          </v-list-item>
+          <v-list-item>
+            <v-btn text @click="onClickButton">LOG OUT</v-btn>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+
+      <v-btn v-if="!userInfo && !admin">
         <nuxt-link to="/signin" class="link-set">
           <div class="text-set">Sign In</div>
         </nuxt-link>
       </v-btn>
-      <v-menu v-if="userInfo" offset-y>
+      <v-menu v-if="userInfo && !admin" offset-y>
         <template v-slot:activator="{ on, attrs }">
           <v-btn dark v-bind="attrs" v-on="on">
-            <div class="text-set">
-              {{ userInfo.email }} ( {{ userInfo.name }} )
-            </div>
+            <div class="text-set">{{ userInfo.email }} ( {{ userInfo.name }} )</div>
           </v-btn>
         </template>
         <v-list>
           <v-list-item>
             <v-btn text>
               <nuxt-link to="/mypage" class="link-set">
-                <div class="text-set">
-                  MY PAGE
-                </div>
+                <div class="text-set">MY PAGE</div>
               </nuxt-link>
             </v-btn>
           </v-list-item>
           <v-list-item>
-            <v-btn text @click="onClickButton">
-              LOG OUT
-            </v-btn>
+            <v-btn text @click="onClickButton">LOG OUT</v-btn>
           </v-list-item>
         </v-list>
       </v-menu>
     </v-app-bar>
     <v-main>
+      <v-tabs v-if="inProductPage">
+        <v-tab>Item One</v-tab>
+        <v-tab>Item Two</v-tab>
+        <v-tab>Item Three</v-tab>
+      </v-tabs>
       <v-container>
         <nuxt />
       </v-container>
@@ -71,12 +92,8 @@
     <v-snackbar v-model="snackbar" :top="true" :timeout="null">
       Log Out?
       <template v-slot:action="{ attrs }">
-        <v-btn color="blue" text v-bind="attrs" @click="onLogout">
-          Yes
-        </v-btn>
-        <v-btn text v-bind="attrs" @click="snackbar = false">
-          No
-        </v-btn>
+        <v-btn color="blue" text v-bind="attrs" @click="onLogout">Yes</v-btn>
+        <v-btn text v-bind="attrs" @click="snackbar = false">No</v-btn>
       </template>
     </v-snackbar>
 
@@ -105,32 +122,33 @@ export default {
       loginStatus: 'SignIn',
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/',
+          icon: 'mdi-dog',
+          title: 'Product',
+          to: '/product',
         },
         {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire',
+          icon: 'mdi-format-list-checkbox',
+          title: 'Buying list',
+          to: '/buyinglist',
         },
       ],
-      miniVariant: false,
       title: 'dbdbdip',
       snackbar: false,
       dialog: false,
+      inProductPage: null,
     };
   },
   computed: {
     ...mapState({
       userInfo: (state) => state.user.userInfo,
+      admin: (state) => state.user.admin,
     }),
   },
   components: {
     Dialog,
   },
   mounted() {
-    if (localStorage.accessToken !== undefined) {
+    if (localStorage.accessToken !== undefined && !this.admin) {
       console.log('have a access token');
       this.$store.dispatch('user/getInfo');
     }

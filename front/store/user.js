@@ -5,6 +5,7 @@ export const state = () => ({
   signedUp: false,
   updated: false,
   updatedPassword: false,
+  admin: false,
 });
 
 export const mutations = {
@@ -42,9 +43,18 @@ export const mutations = {
     state.message = data.message;
     state.userInfo = null;
   },
+  LOGIN_ADMIN_SUCCESS(state) {
+    state.loggedIn = true;
+    state.admin = true;
+  },
+  LOGIN_ADMIN_FAILURE(state) {
+    state.loggedIn = false;
+    state.admin = false;
+  },
   LOGOUT_SUCCESS(state) {
     state.loggedIn = false;
     state.userInfo = null;
+    state.admin = false;
   },
   GET_INFO_ME_SUCCESS(state, data) {
     state.loggedIn = true;
@@ -128,7 +138,10 @@ export const actions = {
       .then((res) => {
         console.log(res);
         localStorage.accessToken = res.data.data.token;
-
+        if (res.data.data.user.email === 'admin') {
+          commit('LOGIN_ADMIN_SUCCESS');
+          return;
+        }
         const data = {
           message: 'success',
           userInfo: res.data.data.user,
