@@ -1,4 +1,4 @@
-import colors from 'vuetify/es5/util/colors'
+import colors from 'vuetify/es5/util/colors';
 
 export default {
   /*
@@ -50,13 +50,11 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: [
-    '@nuxtjs/axios',
-  ],
+  modules: ['@nuxtjs/axios'],
 
   axios: {
     // axios 모듈 설정
-    baseURL: process.env.BASE_URL || 'http://localhost:8081'
+    baseURL: process.env.BASE_URL || 'http://localhost:8081',
   },
 
   /*
@@ -85,4 +83,4 @@ export default {
    ** See https://nuxtjs.org/api/configuration-build/
    */
   build: {},
-}
+};

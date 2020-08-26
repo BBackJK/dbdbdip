@@ -22,37 +22,23 @@
         @click:append="show = !show"
       ></v-text-field>
       <br />
-      <v-btn class="mr-4" @click="loginSubmit">submit</v-btn>
-      <v-btn @click="loginClear">clear</v-btn>
+      <v-btn class="mr-4" @click="loginSubmit" color="primary">SIGN IN</v-btn>
+      <v-btn @click="loginClear">CLEAR</v-btn>
       <br />
       <br />
       <nuxt-link to="signup" class="signup-link"
         ><span class="signup-text">Not Family? Go Sign Up</span></nuxt-link
       >
 
-      <v-snackbar v-model="snackbar" :top="true">
-        Checking Email and Password !
+      <Snackbar v-if="snackbar" :title="title" :snackbar-flag="snackbar" />
 
-        <template v-slot:action="{ attrs }">
-          <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
-            Close
-          </v-btn>
-        </template>
-      </v-snackbar>
-
-      <v-dialog v-model="dialog" max-width="290">
-        <v-card>
-          <v-card-title class="headline">Success!</v-card-title>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-
-            <v-btn color="green darken-1" text @click="onSuccessSignIn">
-              Go Home!
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <Dialog
+        v-if="dialog"
+        :dialog-flag="dialog"
+        headline="Sign In Success!"
+        link-title="Go Home!"
+        link-push="/"
+      />
     </form>
   </div>
 </template>
@@ -62,7 +48,14 @@ import { validationMixin } from 'vuelidate';
 import { required, minLength, email } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
 
+import Snackbar from '@/components/Snackbar.vue';
+import Dialog from '@/components/Dialog.vue';
+
 export default {
+  components: {
+    Snackbar,
+    Dialog,
+  },
   mixins: [validationMixin],
 
   validations: {
@@ -79,14 +72,14 @@ export default {
     show: false,
     snackbar: false,
     dialog: false,
+    title: '',
   }),
 
   computed: {
     ...mapState({
-      userInfo: (state) => state.auth.userInfo,
-      accessToken: (state) => state.auth.accessToken,
-      message: (state) => state.auth.message,
-      loggedIn: (state) => state.auth.message,
+      userInfo: (state) => state.user.userInfo,
+      message: (state) => state.user.message,
+      loggedIn: (state) => state.user.loggedIn,
     }),
     passwordErrors() {
       const errors = [];
@@ -115,30 +108,46 @@ export default {
 
   methods: {
     async loginSubmit() {
+      this.snackbar = false;
+      this.dialog = false;
       this.$v.$touch();
       const data = {
         email: this.email,
         password: this.password,
       };
 
-      await this.$store.dispatch('auth/login', data);
+      await this.$store.dispatch('user/login', data);
 
-      this.message === 'Unauthorized'
-        ? (this.snackbar = true)
-        : (this.dialog = true);
+      if (this.loggedIn) {
+        this.dialog = true;
+        this.snackbar = false;
+      } else if (this.message === 'Unauthorized') {
+        this.snackbar = true;
+        this.dialog = false;
+        this.title = 'Checking Email and Password !';
+        const time1 = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time1);
+          }
+        }, 5000);
+      } else {
+        this.snackbar = true;
+        this.dialog = false;
+        this.title = 'Unknown error! Repeat Sign In!';
+        const time2 = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time2);
+          }
+        }, 5000);
+      }
     },
 
     loginClear() {
       this.$v.$reset();
       this.password = '';
       this.email = '';
-    },
-
-    onSuccessSignIn() {
-      this.$v.$reset();
-      this.password = '';
-      this.email = '';
-      this.$router.push('/');
     },
   },
 };

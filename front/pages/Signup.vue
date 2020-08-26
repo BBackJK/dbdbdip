@@ -10,11 +10,11 @@
         @blur="$v.name.$touch()"
       ></v-text-field>
       <v-text-field
+        ref="email"
         v-model="email"
         :error-messages="emailErrors"
         label="E-mail"
         required
-        ref="email"
         @input="$v.email.$touch()"
         @blur="$v.email.$touch()"
       ></v-text-field>
@@ -65,32 +65,18 @@
         @blur="$v.address.$touch()"
       ></v-text-field>
       <br />
-      <v-btn class="mr-4" @click="signupSubmit">submit</v-btn>
-      <v-btn @click="signupClear">clear</v-btn>
+      <v-btn class="mr-4" color="primary" @click="signupSubmit">SIGN UP</v-btn>
+      <v-btn @click="signupClear">CLEAR</v-btn>
 
-      <v-snackbar v-model="snackbar" :top="true">
-        Already Exist Email !!
+      <Snackbar v-if="snackbar" :title="title" :snackbar-flag="snackbar" />
 
-        <template v-slot:action="{ attrs }">
-          <v-btn color="blue" text v-bind="attrs" @click="snackbar = false">
-            Close
-          </v-btn>
-        </template>
-      </v-snackbar>
-
-      <v-dialog v-model="dialog" max-width="290">
-        <v-card>
-          <v-card-title class="headline">Success!</v-card-title>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-
-            <v-btn color="green darken-1" text @click="onSuccessSignUp">
-              Go Sign In!
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <Dialog
+        v-if="dialog"
+        :dialog-flag="dialog"
+        headline="Sign Up Success!"
+        link-title="Go Sign In!"
+        link-push="/signin"
+      />
     </form>
   </div>
 </template>
@@ -99,6 +85,9 @@
 import { validationMixin } from 'vuelidate';
 import { required, minLength, email, sameAs } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
+
+import Snackbar from '@/components/Snackbar.vue';
+import Dialog from '@/components/Dialog.vue';
 
 export default {
   mixins: [validationMixin],
@@ -138,6 +127,10 @@ export default {
     },
   },
 
+  components: {
+    Snackbar,
+    Dialog,
+  },
   data() {
     return {
       show: false,
@@ -150,12 +143,14 @@ export default {
       address: 'adasa',
       snackbar: false,
       dialog: false,
+      title: '',
     };
   },
 
   computed: {
     ...mapState({
       signedUp: (state) => state.user.signedUp,
+      message: (state) => state.user.message,
     }),
     passwordCheckErrors() {
       const errors = [];
@@ -242,6 +237,8 @@ export default {
   methods: {
     async signupSubmit() {
       this.$v.$touch();
+      this.snackbar = false;
+      this.dialog = false;
 
       const postData = {
         name: this.name,
@@ -254,10 +251,31 @@ export default {
 
       await this.$store.dispatch('user/signup', postData);
 
-      // eslint-disable-next-line no-unused-expressions
-      this.signedUp
-        ? (this.dialog = true)
-        : (this.$refs.email.focus(), (this.snackbar = true));
+      if (this.signedUp) {
+        this.dialog = true;
+        this.snackbar = false;
+      } else if (this.message === 'Conflict') {
+        this.$refs.email.focus();
+        this.snackbar = true;
+        this.dialog = false;
+        this.title = 'Already Exist Email !!';
+        const time1 = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time1);
+          }
+        }, 5000);
+      } else {
+        this.snackbar = true;
+        this.dialog = false;
+        this.title = 'Unknown Error! Repeat Sign Up!';
+        const time2 = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time2);
+          }
+        }, 5000);
+      }
     },
     signupClear() {
       this.$v.$reset();

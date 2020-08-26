@@ -123,7 +123,7 @@ export default {
   },
   computed: {
     ...mapState({
-      userInfo: (state) => state.auth.userInfo,
+      userInfo: (state) => state.user.userInfo,
     }),
   },
   components: {
@@ -132,7 +132,7 @@ export default {
   mounted() {
     if (localStorage.accessToken !== undefined) {
       console.log('have a access token');
-      this.$store.dispatch('auth/getInfo');
+      this.$store.dispatch('user/getInfo');
     }
   },
   methods: {
@@ -143,7 +143,7 @@ export default {
     onLogout() {
       this.snackbar = false;
       this.dialog = true;
-      this.$store.dispatch('auth/logout');
+      this.$store.dispatch('user/logout');
     },
   },
 };
