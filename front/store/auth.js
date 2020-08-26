@@ -19,6 +19,14 @@ export const mutations = {
     state.loggedIn = false;
     state.userInfo = null;
   },
+  GET_INFO_ME_SUCCESS(state, data) {
+    state.loggedIn = true;
+    state.userInfo = data.data.data.user;
+  },
+  GET_INFO_ME_FAILURE(state) {
+    state.loggedIn = false;
+    state.userInfo = null;
+  },
 };
 
 export const actions = {
@@ -28,6 +36,7 @@ export const actions = {
       .then((res) => {
         console.log(res);
         localStorage.accessToken = res.data.data.token;
+
         const data = {
           message: 'success',
           userInfo: res.data.data.user,
@@ -50,21 +59,22 @@ export const actions = {
       });
   },
   logout({ commit }) {
+    localStorage.clear();
     commit('LOGOUT_SUCCESS');
   },
-};
-
-export const getters = {
-  getAccessToken(state) {
-    return state.accessToken;
-  },
-  getUserInfo(state) {
-    return state.userInfo;
-  },
-  getMessage(state) {
-    return state.message;
-  },
-  getLoggedIn(state) {
-    return state.loggedIn;
+  getInfo({ commit }) {
+    this.$axios
+      .get('/auth/me', {
+        headers: {
+          Authorization: `Bearer ${localStorage.accessToken}`,
+        },
+      })
+      .then((res) => {
+        commit('GET_INFO_ME_SUCCESS', res);
+      })
+      .catch((err) => {
+        console.log(err);
+        commit('GET_INFO_ME_FAILURE');
+      });
   },
 };

@@ -26,42 +26,75 @@
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <nuxt-link to="/" class="title-link">
+      <nuxt-link to="/" class="link-set">
         <v-toolbar-title>
-          <div class="title-text">
-            dbdbdip
-          </div>
+          <div class="text-set">dbdbdip</div>
         </v-toolbar-title>
       </nuxt-link>
       <v-spacer />
       <v-btn v-if="!userInfo">
-        <nuxt-link to="/signin" class="signin-link">
-          <div class="signin-text">
-            Sign In
-          </div>
+        <nuxt-link to="/signin" class="link-set">
+          <div class="text-set">Sign In</div>
         </nuxt-link>
       </v-btn>
-      <v-btn v-if="userInfo">
-        <nuxt-link to="/mypage" class="signin-link">
-          <div class="signin-text">
-            {{ userInfo.email }} ( {{ userInfo.name }} )
-          </div>
-        </nuxt-link>
-      </v-btn>
+      <v-menu v-if="userInfo" offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn dark v-bind="attrs" v-on="on">
+            <div class="text-set">
+              {{ userInfo.email }} ( {{ userInfo.name }} )
+            </div>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item>
+            <v-btn text>
+              <nuxt-link to="/mypage" class="link-set">
+                <div class="text-set">
+                  MY PAGE
+                </div>
+              </nuxt-link>
+            </v-btn>
+          </v-list-item>
+          <v-list-item>
+            <v-btn text @click="onClickButton">
+              LOG OUT
+            </v-btn>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-app-bar>
     <v-main>
       <v-container>
         <nuxt />
       </v-container>
     </v-main>
-    <v-footer :absolute="!fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
+    <v-snackbar v-model="snackbar" :top="true" :timeout="null">
+      Log Out?
+      <template v-slot:action="{ attrs }">
+        <v-btn color="blue" text v-bind="attrs" @click="onLogout">
+          Yes
+        </v-btn>
+        <v-btn text v-bind="attrs" @click="snackbar = false">
+          No
+        </v-btn>
+      </template>
+    </v-snackbar>
+
+    <Dialog
+      v-if="dialog"
+      :dialog-flag="dialog"
+      headline="Logout Success!"
+      link-title="Go Home"
+      link-push="/"
+      :reset-flag="true"
+    />
   </v-app>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+
+import Dialog from '@/components/Dialog.vue';
 
 export default {
   data() {
@@ -84,6 +117,8 @@ export default {
       ],
       miniVariant: false,
       title: 'dbdbdip',
+      snackbar: false,
+      dialog: false,
     };
   },
   computed: {
@@ -91,26 +126,35 @@ export default {
       userInfo: (state) => state.auth.userInfo,
     }),
   },
+  components: {
+    Dialog,
+  },
   mounted() {
-    const { accessToken } = localStorage;
-    console.log(accessToken);
+    if (localStorage.accessToken !== undefined) {
+      console.log('have a access token');
+      this.$store.dispatch('auth/getInfo');
+    }
+  },
+  methods: {
+    onClickButton() {
+      this.dialog = false;
+      this.snackbar = true;
+    },
+    onLogout() {
+      this.snackbar = false;
+      this.dialog = true;
+      this.$store.dispatch('auth/logout');
+    },
   },
 };
 </script>
 
 <style>
-.signin-link {
+.link-set {
   text-decoration: none;
 }
 
-.title-link {
-  text-decoration: none;
-}
-.signin-text {
-  color: white;
-}
-
-.title-text {
+.text-set {
   color: white;
 }
 </style>
