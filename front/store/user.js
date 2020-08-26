@@ -1,8 +1,10 @@
 export const state = () => ({
+  userInfo: null,
   message: null,
+  loggedIn: false,
   signedUp: false,
-  userTokenInfo: null,
-  gettingUser: false,
+  updated: false,
+  updatedPassword: false,
 });
 
 export const mutations = {
@@ -14,15 +16,43 @@ export const mutations = {
     state.signedUp = false;
     state.message = data.message;
   },
-  GET_USER_INFO_SUCCESS(state, data) {
-    state.userTokenInfo = data.userInfo;
-    state.message = data.message;
-    state.gettingUser = true;
+  UPDATE_USER_INFO_SUCCESS(state, data) {
+    state.updated = true;
+    state.userInfo = data;
   },
-  GET_USER_INFO_FAILURE(state, data) {
-    state.userTokenInfo = null;
+  UPDATE_USER_INFO_FAILURE(state) {
+    state.updated = false;
+    state.userInfo = null;
+  },
+  UPDATE_USER_PASSWORD_SUCCESS(state, data) {
+    state.updatedPassword = true;
     state.message = data.message;
-    state.gettingUser = false;
+  },
+  UPDATE_USER_PASSWORD_FAILURE(state, data) {
+    state.updatedPassword = false;
+    state.message = data.message;
+  },
+  LOGIN_SUCCESS(state, data) {
+    state.message = data.message;
+    state.userInfo = data.userInfo;
+    state.loggedIn = true;
+  },
+  LOGIN_FAILURE(state, data) {
+    state.loggedIn = false;
+    state.message = data.message;
+    state.userInfo = null;
+  },
+  LOGOUT_SUCCESS(state) {
+    state.loggedIn = false;
+    state.userInfo = null;
+  },
+  GET_INFO_ME_SUCCESS(state, data) {
+    state.loggedIn = true;
+    state.userInfo = data.data.data.user;
+  },
+  GET_INFO_ME_FAILURE(state) {
+    state.loggedIn = false;
+    state.userInfo = null;
   },
 };
 
@@ -50,28 +80,93 @@ export const actions = {
         commit('SIGNUP_FAILURE', data);
       });
   },
-  getUserInfo({ commit }, paramData) {
-    return this.$axios
-      .get('/user/info', {
-        params: {
-          email: paramData,
+  async updateUserInfo({ commit }, putData) {
+    await this.$axios
+      .put('/user', putData)
+      .then((res) => {
+        console.log(res);
+        commit('UPDATE_USER_INFO_SUCCESS', res.data.data.user);
+      })
+      .catch((err) => {
+        console.log(err);
+        commit('UPDATE_USER_INFO_FAILURE');
+      });
+  },
+  async updateUserPassword({ commit }, putData) {
+    await this.$axios
+      .put('/user/password', putData)
+      .then((res) => {
+        console.log(res);
+
+        const data = {};
+
+        if (res.data.code === 409) {
+          data.message = 'Password Confilct!';
+
+          commit('UPDATE_USER_PASSWORD_FAILURE', data);
+
+          return;
+        }
+
+        data.message = 'Updated Success!';
+
+        commit('UPDATE_USER_PASSWORD_SUCCESS', data);
+      })
+      .catch((err) => {
+        console.log(err);
+
+        const data = {};
+
+        data.message = err.response.message;
+
+        commit('UPDATE_USER_PASSWORD_FAILURE', data);
+      });
+  },
+  async login({ commit }, loginData) {
+    await this.$axios
+      .post('/auth/login', loginData)
+      .then((res) => {
+        console.log(res);
+        localStorage.accessToken = res.data.data.token;
+
+        const data = {
+          message: 'success',
+          userInfo: res.data.data.user,
+        };
+        commit('LOGIN_SUCCESS', data);
+      })
+      .catch((err) => {
+        console.log(err);
+        const data = {};
+
+        if (err.response.status === 401) {
+          data.message = 'Unauthorized';
+          commit('LOGIN_FAILURE', data);
+
+          return;
+        }
+
+        data.message = 'Unknown Error';
+        commit('LOGIN_FAILURE', data);
+      });
+  },
+  async getInfo({ commit }) {
+    await this.$axios
+      .get('/auth/me', {
+        headers: {
+          Authorization: `Bearer ${localStorage.accessToken}`,
         },
       })
       .then((res) => {
-        const data = {};
-
-        data.message = 'success';
-        data.userInfo = res.data.data.user;
-
-        commit('GET_USER_INFO_SUCCESS', data);
-
-        return res.data.data.user;
+        commit('GET_INFO_ME_SUCCESS', res);
       })
       .catch((err) => {
-        const data = {};
-
-        data.message = err.message;
-        commit('GET_USER_INFO_FAILURE', data);
+        console.log(err);
+        commit('GET_INFO_ME_FAILURE');
       });
+  },
+  logout({ commit }) {
+    localStorage.clear();
+    commit('LOGOUT_SUCCESS');
   },
 };
