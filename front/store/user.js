@@ -179,7 +179,7 @@ export const actions = {
       });
   },
   logout({ commit }) {
-    localStorage.clear();
+    localStorage.removeItem('accessToken');
     commit('LOGOUT_SUCCESS');
   },
 };

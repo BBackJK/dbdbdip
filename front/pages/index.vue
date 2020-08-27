@@ -7,5 +7,9 @@
 </template>
 
 <script>
-export default {};
+export default {
+  created() {
+    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
+  },
+};
 </script>

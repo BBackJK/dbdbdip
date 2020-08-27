@@ -20,7 +20,7 @@
         </v-toolbar-title>
       </nuxt-link>
       <v-spacer />
-      <v-menu v-if="admin" offset-y>
+      <!-- <v-menu v-if="admin" offset-y>
         <template v-slot:activator="{ on, attrs }">
           <v-btn dark v-bind="attrs" v-on="on">
             <div class="text-set">ADMIN</div>
@@ -52,8 +52,16 @@
             <v-btn text @click="onClickButton">LOG OUT</v-btn>
           </v-list-item>
         </v-list>
-      </v-menu>
-
+      </v-menu> -->
+      <v-btn>
+        <nuxt-link to="/cart" class="link-set">
+        <div class="text-set"> 
+        <v-icon>mdi-cart-minus</v-icon>
+              Cart 
+              <v-badge v-if="inCarted" color="red" dot />
+        </div>
+        </nuxt-link>
+      </v-btn>
       <v-btn v-if="!userInfo && !admin">
         <nuxt-link to="/signin" class="link-set">
           <div class="text-set">Sign In</div>
@@ -80,10 +88,10 @@
       </v-menu>
     </v-app-bar>
     <v-main>
-      <v-tabs v-if="inProductPage">
-        <v-tab>Item One</v-tab>
-        <v-tab>Item Two</v-tab>
-        <v-tab>Item Three</v-tab>
+      <v-tabs v-if="currentPage.startsWith('product')">
+        <v-tab v-for="category in categories" :key="category.id">
+          {{ category.name }}
+        </v-tab>
       </v-tabs>
       <v-container>
         <nuxt />
@@ -135,13 +143,15 @@ export default {
       title: 'dbdbdip',
       snackbar: false,
       dialog: false,
-      inProductPage: null,
     };
   },
   computed: {
     ...mapState({
       userInfo: (state) => state.user.userInfo,
       admin: (state) => state.user.admin,
+      currentPage: (state) => state.page.currentPageName,
+      categories: (state) => state.category.categories,
+      inCarted: (state) => state.cart.inCarted,
     }),
   },
   components: {

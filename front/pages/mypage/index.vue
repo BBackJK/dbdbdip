@@ -5,13 +5,13 @@
         v-model="email"
         label="E-mail"
         required
-        disabled
+        readonly
       ></v-text-field>
       <v-text-field v-model="name" label="Name" required></v-text-field>
       <v-text-field v-model="phone" label="Phone" required></v-text-field>
       <v-text-field v-model="zipcode" label="Zip-code" required></v-text-field>
       <v-text-field v-model="address" label="Address" required></v-text-field>
-      <v-text-field v-model="updatedAt" label="Last Updated Date" disabled />
+      <v-text-field v-model="updatedAt" label="Last Updated Date" readonly />
       <br />
       <v-btn
         class="mr-4"
