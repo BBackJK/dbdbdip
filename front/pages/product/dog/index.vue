@@ -28,20 +28,6 @@
         <Snackbar v-if="snackbar" :title="title" :snackbar-flag="snackbar" />
       </v-col>
     </v-row>
-    <v-row>
-      <v-btn
-        v-if="admin"
-        color="red"
-        fab
-        large
-        dark
-        bottom
-        right
-        @click="onAddProduct"
-      >
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </v-row>
   </v-container>
 </template>
 
@@ -67,7 +53,6 @@ export default {
     ...mapState({
       dogItems: (state) => state.product.dogItems,
       cartItems: (state) => state.cart.cartItems,
-      admin: (state) => state.user.admin,
     }),
   },
   methods: {
@@ -100,11 +85,7 @@ export default {
     onProductDetail(item) {
       console.log(item);
       this.$store.dispatch('product/pushSelectData', item);
-      this.$router.push(`/product/${item.id}`);
       this.$router.push(`/product/dog/${item.id}`);
-    },
-    onAddProduct() {
-      this.$router.push('/admin/add/dog');
     },
   },
 };
@@ -124,10 +105,18 @@ export default {
 }
 
 .button-area {
+  /* margin: 0;
+  padding: 0; */
+  /* display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex; */
   display: flex;
   justify-content: space-between;
 }
 .button-item {
+  /* display: inline-block; */
   text-align: center;
   float: right;
 }

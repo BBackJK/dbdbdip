@@ -1,60 +1,151 @@
 <template>
-<v-list three-line>
-      <template >
-        <v-subheader>Cart List</v-subheader>
+  <v-row align="center">
+    <v-expansion-panels :multiple="true" :popout="true">
+      <v-expansion-panel>
+        <v-expansion-panel-header>
+          <v-row no-gutters>
+            <v-col cols="8">
+              Product Order List
+            </v-col>
+            <v-col cols="3" class="text--secondary">
+              Total Price :
+              {{ totalPrice }} won
+            </v-col>
+          </v-row>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-list-item v-for="item in orderItems" :key="item.id">
+            <v-list-item-avatar>
+              <v-img :src="item.image"></v-img>
+            </v-list-item-avatar>
 
-        <v-list-item
-        v-for="(item) in orderItems"
-          :key="item.id"
-        >
-          <v-list-item-avatar>
-            <v-img :src="item.image"></v-img>
-          </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title> Name </v-list-item-title>
+              <v-list-item-subtitle> {{ item.name }}</v-list-item-subtitle>
+            </v-list-item-content>
 
-          <v-list-item-content>
-            <v-list-item-title v-html="item.name"></v-list-item-title>
-            <v-list-item-subtitle> {{ item.price }}  won</v-list-item-subtitle>
-          </v-list-item-content>
-          <!-- <v-list-item-content>
-            Quantity: 
-            <v-list-item-subtitle>
-            <v-btn x-small :disabled="item.orderQuantity === 1" @click="onDownQuantity(item.id)"><v-icon>mdi-minus</v-icon></v-btn>
-          {{item.orderQuantity}}
-      <v-btn x-small @click="onUpQuantity(item.id)"><v-icon>mdi-plus</v-icon></v-btn>
-            </v-list-item-subtitle>
-          </v-list-item-content> -->
-          <v-list-item-content>
-            Quantity: 
-            <v-list-item-subtitle>
-            {{ item.orderQuantity }}
-            </v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
-      <br />
-      Total Price : {{totalPrice}} won
-      <br />      
-    </v-list>
+            <v-list-item-content>
+              <v-list-item-title>Price</v-list-item-title>
+              <v-list-item-subtitle> {{ item.price }} won</v-list-item-subtitle>
+            </v-list-item-content>
+
+            <v-list-item-content>
+              <v-list-item-title>Quantity</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ item.orderQuantity }} ea</v-list-item-subtitle
+              >
+            </v-list-item-content>
+
+            <v-list-item-content>
+              <v-list-item-title>Sub-Total</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ item.orderQuantity * item.price * 1 }}
+                won</v-list-item-subtitle
+              >
+            </v-list-item-content>
+          </v-list-item>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-header>
+          <v-row no-gutters>
+            <v-col cols="24">
+              Order User Info
+            </v-col>
+            <v-col cols="6" class="text--secondary" v-if="this.name === ''">
+              Order User name : Write Your name
+            </v-col>
+            <v-col cols="4" class="text--secondary" v-else>
+              Order User name :
+              {{ orderUsername }}
+            </v-col>
+          </v-row>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <form>
+            <v-text-field v-model="name" label="Name" required></v-text-field>
+            <v-text-field
+              v-model="email"
+              label="E-mail"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="phone"
+              label="Phone (not hypen -)"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="zipcode"
+              label="Zipcode"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="address"
+              label="Address"
+              required
+            ></v-text-field>
+            <br />
+          </form>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <v-main>
+      <v-btn class="mr-4" color="orange" @click="onClickTest">PAYMENT</v-btn>
+      <v-btn>CANCEL</v-btn>
+    </v-main>
+  </v-row>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 
 export default {
+  data() {
+    return {
+      name: '',
+      email: '',
+      phone: '',
+      zipcode: '',
+      address: '',
+    };
+  },
+  mounted() {
+    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
+    console.log(this.orderItems);
+    console.log(this.totalPrice);
+  },
   computed: {
     ...mapState({
       orderItems: (state) => state.order.orderItems,
-      totalPrice: (state) => state.order.totalPrice
-    })
+      totalPrice: (state) => state.order.totalPrice,
+    }),
+    orderUsername() {
+      return this.name;
+    },
   },
-  mounted() {
-    console.log(this.orderItems);
-    console.log(this.totalPrice);
-  }
-}
+  methods: {
+    onClickTest() {
+      console.log('click!!');
+      const orderData = {
+        name: this.name,
+        email: this.email,
+        phone: this.phone,
+        zipcode: this.zipcode,
+        address: this.address,
+      };
+      console.log(orderData);
+    },
+  },
+};
 </script>
 
 <style>
-
+.price-where {
+  float: right;
+}
 </style>
-

@@ -4,9 +4,9 @@
 
 <script>
 export default {
-    created() {
-    console.log(this.$nuxt.$route.name);
-  }
+  created() {
+    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
+  },
 };
 </script>
 <style scoped></style>

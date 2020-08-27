@@ -1,8 +1,20 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer v-model="drawer" :mini-variant="false" :clipped="clipped" fixed app>
+    <v-navigation-drawer
+      v-model="drawer"
+      :mini-variant="false"
+      :clipped="clipped"
+      fixed
+      app
+    >
       <v-list>
-        <v-list-item v-for="(item, i) in items" :key="i" :to="item.to" router exact>
+        <v-list-item
+          v-for="(item, i) in items"
+          :key="i"
+          :to="item.to"
+          router
+          exact
+        >
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
@@ -20,7 +32,7 @@
         </v-toolbar-title>
       </nuxt-link>
       <v-spacer />
-      <!-- <v-menu v-if="admin" offset-y>
+      <v-menu v-if="admin" offset-y>
         <template v-slot:activator="{ on, attrs }">
           <v-btn dark v-bind="attrs" v-on="on">
             <div class="text-set">ADMIN</div>
@@ -52,14 +64,14 @@
             <v-btn text @click="onClickButton">LOG OUT</v-btn>
           </v-list-item>
         </v-list>
-      </v-menu> -->
+      </v-menu>
       <v-btn>
         <nuxt-link to="/cart" class="link-set">
-        <div class="text-set"> 
-        <v-icon>mdi-cart-minus</v-icon>
-              Cart 
-              <v-badge v-if="inCarted" color="red" dot />
-        </div>
+          <div class="text-set">
+            <v-icon>mdi-cart-minus</v-icon>
+            Cart
+            <v-badge v-if="inCarted" color="red" dot />
+          </div>
         </nuxt-link>
       </v-btn>
       <v-btn v-if="!userInfo && !admin">
@@ -67,10 +79,17 @@
           <div class="text-set">Sign In</div>
         </nuxt-link>
       </v-btn>
+      <!-- admin login dev -->
+      <v-btn @click="onLoginAdmin" v-if="!admin">
+        <div class="text-set">Admin Login</div>
+      </v-btn>
+      <!-- -->
       <v-menu v-if="userInfo && !admin" offset-y>
         <template v-slot:activator="{ on, attrs }">
           <v-btn dark v-bind="attrs" v-on="on">
-            <div class="text-set">{{ userInfo.email }} ( {{ userInfo.name }} )</div>
+            <div class="text-set">
+              {{ userInfo.email }} ( {{ userInfo.name }} )
+            </div>
           </v-btn>
         </template>
         <v-list>
@@ -89,9 +108,22 @@
     </v-app-bar>
     <v-main>
       <v-tabs v-if="currentPage.startsWith('product')">
-        <v-tab v-for="category in categories" :key="category.id">
+        <v-tab
+          v-for="category in categories"
+          :key="category.id"
+          @click="onTabClick(category.name)"
+        >
           {{ category.name }}
         </v-tab>
+        <!-- <v-tab>
+          Dog
+        </v-tab>
+        <v-tab @click="onTabClick">
+          Cat
+        </v-tab>
+        <v-tab>
+          Item
+        </v-tab> -->
       </v-tabs>
       <v-container>
         <nuxt />
@@ -172,6 +204,13 @@ export default {
       this.snackbar = false;
       this.dialog = true;
       this.$store.dispatch('user/logout');
+    },
+    onTabClick(name) {
+      // console.log(name.toLowerCase());
+      this.$router.push(`/product/${name.toLowerCase()}`);
+    },
+    onLoginAdmin() {
+      this.$store.dispatch('user/adminLogin');
     },
   },
 };

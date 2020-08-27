@@ -8,16 +8,15 @@ export const mutations = {
     state.cartItems.push(data);
     state.inCarted = true;
   },
-  // UP_ORDER_QUANTITY(state, data) {
-  //   for(let i = 0 ; i < state.cartItems.length ; i++) {
-  //     if (state.cartItems[i].id === data) {
-  //       console.log(state.cartItems[i].orderQuantity);
-  //       state.cartItems[i].orderQuantity++;
-  //       console.log(state.cartItems[i].orderQuantity);
-  //       i = state.cartItems.length + 1;
-  //     }
-  //   }
-  // }
+  POP_CART(state, data) {
+    const idx = state.cartItems.findIndex((item) => {
+      return item.id === data.id;
+    });
+    if (idx > -1) state.cartItems.splice(idx, 1);
+  },
+  CHECK_CARTED(state) {
+    state.inCarted = false;
+  },
 };
 
 export const actions = {
@@ -25,7 +24,10 @@ export const actions = {
     if (!data.orderQuantity) data.orderQuantity = 1;
     commit('PUSH_CART', data);
   },
-  // upOrderQuantity({ commit }, data) {
-  //   commit('UP_ORDER_QUANTITY', data);
-  // }
-}
+  popCartData({ commit }, data) {
+    commit('POP_CART', data);
+  },
+  checkCarted({ commit }) {
+    commit('CHECK_CARTED');
+  },
+};

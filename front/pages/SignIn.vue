@@ -1,7 +1,12 @@
 <template>
   <div class="container">
     <form>
-      <v-text-field v-model="email" label="E-mail" ref="email" required></v-text-field>
+      <v-text-field
+        v-model="email"
+        label="E-mail"
+        ref="email"
+        required
+      ></v-text-field>
       <v-text-field
         v-model="password"
         :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"

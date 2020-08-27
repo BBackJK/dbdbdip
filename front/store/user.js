@@ -182,4 +182,9 @@ export const actions = {
     localStorage.removeItem('accessToken');
     commit('LOGOUT_SUCCESS');
   },
+  // 테스트 admin login
+  adminLogin({ commit }) {
+    localStorage.removeItem('accessToken');
+    commit('LOGIN_ADMIN_SUCCESS');
+  },
 };
