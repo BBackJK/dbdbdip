@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace="shop.dbdbdip.back.mapper.ProductMapper">
+
+	<resultMap type="ProductModel" id="ProductResultMap">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="category" column="category" />
+		<result property="price" column="price" />
+		<result property="imagePath" column="imagePath" />
+		<result property="description" column="description" />
+		<result property="quantity" column="quantity" />
+		<result property="sellable" column="sellable" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+	</resultMap>
+	
+	<select id="selectById" parameterType="Integer" resultType="ProductModel">
+		SELECT 
+			* 
+		FROM 
+			product
+		WHERE
+			id = #{id} and deletedAt is null
+	</select>
+	
+	<select id="selectAll" parameterType="String" resultMap="ProductResultMap">
+		SELECT 
+			* 
+		FROM 
+			product
+		WHERE
+			category = #{category} and deletedAt is null
+	</select>
+	
+	<insert id="insertProduct" parameterType="ProductCreateModel">
+		INSERT INTO
+			product 
+			(name, category, price, imagePath, description, quantity, sellable) 
+		VALUES 
+			(#{name},  #{category}, #{price}, #{imagePath}, #{description}, #{quantity}, #{sellable})
+	</insert>
+</mapper>		

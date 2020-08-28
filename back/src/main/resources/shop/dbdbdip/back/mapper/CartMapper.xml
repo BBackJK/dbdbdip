@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace="shop.dbdbdip.back.mapper.CartMapper">
+
+	<resultMap type="UserResponseModel" id="UserResultMap">
+		<result property="id" column="id" />
+		<result property="email" column="email" />
+		<result property="phone" column="phone" />
+		<result property="name" column="name" />
+		<result property="zipcode" column="zipcode" />
+		<result property="address" column="address" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+	</resultMap>
+	
+	<resultMap type="ProductModel" id="ProductResultMap">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="category" column="category" />
+		<result property="price" column="price" />
+		<result property="imagePath" column="imagePath" />
+		<result property="description" column="description" />
+		<result property="quantity" column="quantity" />
+		<result property="sellable" column="sellable" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+	</resultMap>
+
+	<resultMap type="CartModel" id="CartResultMap">
+		<result property="id" column="id" />
+		<result property="orderQuantity" column="orderQuantity" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+		<collection property="user" resultMap="UserResultMap"/>
+		<collection property="product" resultMap="ProductResultMap"/>
+	</resultMap>
+	
+	<insert id="insertCart" parameterType="CartCreateModel">
+		INSERT INTO
+			cart
+			(orderQuantity, user_id, product_id) 
+		VALUES 
+			(#{orderQuantity},  #{user_id}, #{product_id})
+	</insert>
+	
+	<select id="checkProductId" parameterType="Integer" resultMap="CartResultMap">
+		SELECT
+			*
+		FROM
+			cart
+		WHERE
+			product_id = #{productId} and deletedAt is null
+	</select>
+	
+	<select id="selectByUserId" parameterType="Integer" resultMap="CartResultMap">
+		SELECT 
+			* 
+		FROM 
+			cart 
+		JOIN product AS p 
+		ON p.id = cart.product_id 
+		WHERE user_id = #{userId} AND cart.deletedAt is null
+	</select>
+</mapper>		
