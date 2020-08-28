@@ -7,7 +7,7 @@
             <v-img
               class="white--text align-end"
               height="200px"
-              :src="item.image"
+              :src="item.imagePath"
             ></v-img>
 
             <v-card-title class="pb-0">{{ item.name }}</v-card-title>
@@ -19,7 +19,10 @@
           </div>
           <v-card-actions>
             <v-row no-gutters>
-              <v-col cols="3">
+              <v-col cols="3" v-if="userInfo">
+                <v-btn color="orange" text @click="onUserCart(item)">Cart</v-btn>
+              </v-col>
+              <v-col cols="3" v-else>
                 <v-btn color="orange" text @click="onCart(item)">Cart</v-btn>
               </v-col>
             </v-row>
@@ -27,6 +30,20 @@
         </v-card>
         <Snackbar v-if="snackbar" :title="title" :snackbar-flag="snackbar" />
       </v-col>
+    </v-row>
+    <v-row>
+      <v-btn
+        v-if="admin"
+        color="red"
+        fab
+        large
+        dark
+        bottom
+        right
+        @click="onAddProduct"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
     </v-row>
   </v-container>
 </template>
@@ -46,16 +63,62 @@ export default {
   created() {
     this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
   },
+  mounted() {
+    if (!this.dogItems) {
+      this.$store.dispatch('product/getDogProducts', this.$route.name.split('-')[1]);
+    }
+  },
   components: {
     Snackbar,
   },
   computed: {
     ...mapState({
       dogItems: (state) => state.product.dogItems,
+      admin: (state) => state.user.admin,
+      userInfo: (state) => state.user.userInfo,
+      inCarted: (state) => state.cart.inCarted,
       cartItems: (state) => state.cart.cartItems,
+      message: (state) => state.cart.message,
     }),
   },
   methods: {
+    onUserCart(item) {
+      this.snackbar = false;
+
+        console.log(item);
+        const postData = {
+          orderQuantity: 1,
+          user_id: this.userInfo.id,
+          product_id: item.id,
+        }
+
+        this.$store.dispatch('cart/createCartData', postData);
+
+        if (this.inCarted) {
+          this.$store.dispatch('cart/modifyCreatedFlag');
+          this.title = 'Complete Carting';
+          this.snackbar = true;
+
+          const time = setInterval(() => {
+            if (this.snackbar) {
+              this.snackbar = false;
+            clearInterval(time);
+            }
+          }, 5000);
+        }
+
+        if(!this.inCarted && this.message === 'Conflict') {
+          this.title = 'Duplicated Items!';
+          this.snackbar = true;
+          const time = setInterval(() => {
+            if (this.snackbar) {
+              this.snackbar = false;
+              clearInterval(time);
+            }
+          }, 5000);
+          return;
+        }
+    },
     onCart(item) {
       console.log('onCart', item);
       for (let i = 0; i < this.cartItems.length; i++) {
@@ -84,8 +147,10 @@ export default {
     },
     onProductDetail(item) {
       console.log(item);
-      this.$store.dispatch('product/pushSelectData', item);
       this.$router.push(`/product/dog/${item.id}`);
+    },
+    onAddProduct() {
+      this.$router.push('/admin/add/item');
     },
   },
 };

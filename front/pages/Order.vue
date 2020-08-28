@@ -1,7 +1,9 @@
 <template>
   <v-row align="center">
     <v-expansion-panels :multiple="true" :popout="true">
-      <v-expansion-panel>
+
+      <v-expansion-panel v-if="!userInfo">
+
         <v-expansion-panel-header>
           <v-row no-gutters>
             <v-col cols="8">
@@ -13,11 +15,12 @@
             </v-col>
           </v-row>
         </v-expansion-panel-header>
+
         <v-expansion-panel-content>
           <v-list-item v-for="item in orderItems" :key="item.id">
             <v-list-item-avatar>
-              <v-img :src="item.image"></v-img>
-            </v-list-item-avatar>
+              <v-img :src="item.imagePath"></v-img>
+            </v-list-item-avatar>          
 
             <v-list-item-content>
               <v-list-item-title> Name </v-list-item-title>
@@ -45,6 +48,56 @@
             </v-list-item-content>
           </v-list-item>
         </v-expansion-panel-content>
+
+      </v-expansion-panel>
+
+      <v-expansion-panel v-else>
+
+        <v-expansion-panel-header>
+          <v-row no-gutters>
+            <v-col cols="8">
+              Product Order List
+            </v-col>
+            <v-col cols="3" class="text--secondary">
+              Total Price :
+              {{ totalPrice }} won
+            </v-col>
+          </v-row>
+        </v-expansion-panel-header>
+
+        <v-expansion-panel-content>
+          <v-list-item v-for="item in orderItems" :key="item.id">
+            <v-list-item-avatar>
+              <v-img :src="item.product.imagePath"></v-img>
+            </v-list-item-avatar>          
+
+            <v-list-item-content>
+              <v-list-item-title> Name </v-list-item-title>
+              <v-list-item-subtitle> {{ item.product.name }}</v-list-item-subtitle>
+            </v-list-item-content>
+
+            <v-list-item-content>
+              <v-list-item-title>Price</v-list-item-title>
+              <v-list-item-subtitle> {{ item.product.price }} won</v-list-item-subtitle>
+            </v-list-item-content>
+
+            <v-list-item-content>
+              <v-list-item-title>Quantity</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ item.product.orderQuantity }} ea</v-list-item-subtitle
+              >
+            </v-list-item-content>
+
+            <v-list-item-content>
+              <v-list-item-title>Sub-Total</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ item.product.orderQuantity * item.product.price * 1 }}
+                won</v-list-item-subtitle
+              >
+            </v-list-item-content>
+          </v-list-item>
+        </v-expansion-panel-content>
+
       </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-header>
@@ -116,13 +169,20 @@ export default {
   },
   mounted() {
     this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
-    console.log(this.orderItems);
-    console.log(this.totalPrice);
+
+    if (this.userInfo) {
+      this.name = this.userInfo.name,
+      this.email = this.userInfo.email,
+      this.phone = this.userInfo.phone,
+      this.zipcode = this.userInfo.zipcode,
+      this.address = this.userInfo.address
+    }
   },
   computed: {
     ...mapState({
       orderItems: (state) => state.order.orderItems,
       totalPrice: (state) => state.order.totalPrice,
+      userInfo: (state) => state.user.userInfo,
     }),
     orderUsername() {
       return this.name;

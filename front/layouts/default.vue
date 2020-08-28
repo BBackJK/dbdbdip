@@ -79,11 +79,6 @@
           <div class="text-set">Sign In</div>
         </nuxt-link>
       </v-btn>
-      <!-- admin login dev -->
-      <v-btn @click="onLoginAdmin" v-if="!admin">
-        <div class="text-set">Admin Login</div>
-      </v-btn>
-      <!-- -->
       <v-menu v-if="userInfo && !admin" offset-y>
         <template v-slot:activator="{ on, attrs }">
           <v-btn dark v-bind="attrs" v-on="on">
@@ -208,9 +203,6 @@ export default {
     onTabClick(name) {
       // console.log(name.toLowerCase());
       this.$router.push(`/product/${name.toLowerCase()}`);
-    },
-    onLoginAdmin() {
-      this.$store.dispatch('user/adminLogin');
     },
   },
 };

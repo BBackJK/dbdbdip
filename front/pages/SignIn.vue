@@ -49,7 +49,7 @@ export default {
     Dialog,
   },
   data: () => ({
-    email: 'test8@example.com',
+    email: 'test1@example.com',
     password: 'pjkrud6839@@',
     show: false,
     snackbar: false,

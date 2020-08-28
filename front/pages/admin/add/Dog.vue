@@ -10,11 +10,17 @@
       <br />
       <v-btn class="mr-4" color="orange" @click="addDogSubmit">ADD</v-btn>
       <v-btn @click="addDogClear">CLEAR</v-btn>
+
+      <Snackbar v-if="snackbar" title="CREATE PRODUCT SUCCESS !!" :snackbar-flag="snackbar" />
     </form>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
+import Snackbar from '@/components/Snackbar.vue';
+
 export default {
   data() {
     return {
@@ -24,13 +30,24 @@ export default {
       imagePath: '',
       description: '',
       quantity: '',
+      snackbar: false,
     };
   },
   created() {
     this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
   },
+  components: {
+    Snackbar
+  },
+  computed: {
+    ...mapState({
+      productCreated: (state) => state.product.created,
+    })
+  },
   methods: {
     addDogSubmit() {
+      this.snackbar = false;
+
       const postData = {
         name: this.name,
         category: this.category,
@@ -38,10 +55,21 @@ export default {
         imagePath: this.imagePath,
         description: this.description,
         quantity: this.quantity * 1,
+        sellable: true
       };
 
-      console.log(postData);
-      console.log(typeof postData.quantity);
+      this.$store.dispatch('product/createProduct', postData);  
+
+      if (this.productCreated) {
+        this.snackbar = true;
+        this.$store.dispatch('product/modifyCreatedFlag');
+        const time = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time);
+          }
+        }, 5000);
+      }
     },
     addDogClear() {
       this.name = '';

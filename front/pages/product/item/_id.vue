@@ -83,46 +83,7 @@ export default {
     }),
   },
   methods: {
-    onUserCart(item) {
-      this.snackbar = false;
-
-        console.log(item);
-        const postData = {
-          orderQuantity: 1,
-          user_id: this.userInfo.id,
-          product_id: item.id,
-        }
-
-        this.$store.dispatch('cart/createCartData', postData);
-
-        if (this.inCarted) {
-          this.$store.dispatch('cart/modifyCreatedFlag');
-          this.title = 'Complete Carting';
-          this.snackbar = true;
-
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
-            clearInterval(time);
-            }
-          }, 5000);
-        }
-
-        if(!this.inCarted && this.message === 'Conflict') {
-          this.title = 'Duplicated Items!';
-          this.snackbar = true;
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
-              clearInterval(time);
-            }
-          }, 5000);
-          return;
-        }
-    },
     onCart(item) {
-      this.$store.dispatch('cart/pushCartData', item);
-
       for (let i = 0; i < this.cartItems.length; i++) {
         if (item.name === this.cartItems[i].name) {
           this.title = 'Duplicated Items!';
@@ -136,7 +97,7 @@ export default {
           return;
         }
       }
-
+      item.orderQuantity = this.orderQuantity;
       this.title = 'Complete Carting';
       this.snackbar = true;
       const time = setInterval(() => {
@@ -145,6 +106,8 @@ export default {
           clearInterval(time);
         }
       }, 5000);
+
+      this.$store.dispatch('cart/pushCartData', item);
     },
     onOrder(item) {
       const orderItem = [];

@@ -30,8 +30,8 @@
         >
           Order
         </v-btn>
-
-        <v-btn color="orange" text @click="onCart(selectItem)">
+        <v-btn color="orange" text @click="onUserCart(item)" v-if="userInfo">Cart</v-btn>
+        <v-btn color="orange" text @click="onCart(selectItem)" v-else>
           Cart
         </v-btn>
 
@@ -80,6 +80,11 @@ export default {
     ...mapState({
       selectItem: (state) => state.product.selectItem,
       cartItems: (state) => state.cart.cartItems,
+      dogItems: (state) => state.product.dogItems,
+      admin: (state) => state.user.admin,
+      userInfo: (state) => state.user.userInfo,
+      inCarted: (state) => state.cart.inCarted,
+      message: (state) => state.cart.message,
     }),
   },
   methods: {

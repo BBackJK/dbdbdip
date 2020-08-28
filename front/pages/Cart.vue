@@ -9,26 +9,47 @@
         </v-list-item>
 
         <v-list-item v-for="(item, index) in cartItems" :key="item.id" v-else>
+          <template v-if="userInfo">
           <v-list-item-avatar>
-            <v-img :src="item.image"></v-img>
+            <v-img :src="item.product.imagePath"></v-img>
+          </v-list-item-avatar>
+
+          <v-list-item-content>
+            <v-list-item-title v-html="item.product.name"></v-list-item-title>
+            <v-list-item-subtitle> {{ item.product.price }} won</v-list-item-subtitle>
+          </v-list-item-content>
+          </template>
+
+          <template v-else>
+          <v-list-item-avatar>
+            <v-img :src="item.imagePath"></v-img>
           </v-list-item-avatar>
 
           <v-list-item-content>
             <v-list-item-title v-html="item.name"></v-list-item-title>
             <v-list-item-subtitle> {{ item.price }} won</v-list-item-subtitle>
           </v-list-item-content>
+          </template>
+
           <v-list-item-content>
             <v-list-item-title>
               Quantity
             </v-list-item-title>
-            <v-list-item-subtitle>
-              <v-btn
+            <v-list-item-subtitle v-if="cartItems.length !== 0">
+              <!-- <v-btn
                 x-small
                 :disabled="orderInfo[index].orderQuantity === 1"
                 @click="onDownQuantity(item.id)"
                 ><v-icon>mdi-minus</v-icon></v-btn
               >
-              {{ orderInfo[index].orderQuantity }}
+              {{ orderInfo[index].orderQuantity }} -->
+              <v-btn
+                x-small
+                :disabled="getQuantity.orderQuantity === 1"
+                @click="onDownQuantity(item.id)"
+                ><v-icon>mdi-minus</v-icon></v-btn
+              >
+              {{ getQuantity[index].orderQuantity }}
               <v-btn x-small @click="onUpQuantity(item.id)"
                 ><v-icon>mdi-plus</v-icon></v-btn
               >
@@ -72,9 +93,17 @@ export default {
       total: 0,
     };
   },
-  created() {
+  async created() {
     this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
-    this.$store.dispatch('cart/checkCarted');
+
+    // 회원 카트 겟
+    if (this.userInfo) {
+      await this.$store.dispatch('cart/checkCarted');
+      await this.$store.dispatch('cart/getCartData', this.userInfo.id);
+      return;
+    }
+
+    // 비회원 카트 겟
     for (let i = 0; i < this.cartItems.length; i++) {
       const data = {
         id: this.cartItems[i].id,
@@ -83,10 +112,13 @@ export default {
       };
       this.orderInfo.push(data);
     }
+    this.$store.dispatch('cart/checkCarted');
   },
   computed: {
     ...mapState({
       cartItems: (state) => state.cart.cartItems,
+      inCarted: (state) => state.cart.inCarted,
+      userInfo: (state) => state.user.userInfo,
     }),
     onTotalPrice() {
       let totalPrice = 0;
@@ -97,6 +129,19 @@ export default {
       this.total = totalPrice;
       return totalPrice;
     },
+    getQuantity() {
+      if (this.userInfo && this.cartItems.length !== 0){
+        for (let i = 0; i < this.cartItems.length; i++) {
+          const data = {
+            id : this.cartItems[i].product.id,
+            orderQuantity: this.cartItems[i].orderQuantity,
+            price: this.cartItems[i].product.price
+          }
+          this.orderInfo.push(data);
+        }
+        return this.orderInfo;
+      }
+    }
   },
   methods: {
     onDownQuantity(id) {
@@ -117,23 +162,38 @@ export default {
       this.$router.go(-1);
     },
     onOrder() {
-      for (let i = 0; i < this.cartItems.length; i++) {
-        for (let j = 0; j < this.cartItems.length; j++) {
-          if (this.orderInfo[i].id === this.cartItems[j].id) {
-            this.cartItems[j].orderQuantity = this.orderInfo[i].orderQuantity;
+
+      if (!this.userInfo) {
+        for (let i = 0; i < this.cartItems.length; i++) {
+          for (let j = 0; j < this.cartItems.length; j++) {
+            if (this.orderInfo[i].id === this.cartItems[j].id) {
+              this.cartItems[j].orderQuantity = this.orderInfo[i].orderQuantity;
+            }
+          }
+        }
+      } else {
+        for (let i = 0; i < this.cartItems.length; i++) {
+          for (let j = 0; j < this.cartItems.length; j++) {
+            if (this.orderInfo[i].id === this.cartItems[j].product.id) {
+              this.cartItems[j].product.orderQuantity = this.orderInfo[i].orderQuantity;
+            }
           }
         }
       }
-      console.log('this.cartItems', typeof this.cartItems);
       this.$store.dispatch('order/updateTotalPrice', this.total);
       this.$store.dispatch('order/pushOrderData', this.cartItems);
+      console.log(this.cartItems);
       this.$router.push('/order');
     },
     onRemoveCartItem(item) {
-      // console.log(item);
+      console.log(item);
       // console.log(this.cartItems[0]);
       // console.log(item === this.cartItems[0]);
-      this.$store.dispatch('cart/popCartData', item);
+
+      // 비회원
+      if (!this.userInfo) {
+        this.$store.dispatch('cart/popCartData', item);
+      }
     },
   },
 };
