@@ -110,15 +110,6 @@
         >
           {{ category.name }}
         </v-tab>
-        <!-- <v-tab>
-          Dog
-        </v-tab>
-        <v-tab @click="onTabClick">
-          Cat
-        </v-tab>
-        <v-tab>
-          Item
-        </v-tab> -->
       </v-tabs>
       <v-container>
         <nuxt />
@@ -159,7 +150,7 @@ export default {
         {
           icon: 'mdi-dog',
           title: 'Product',
-          to: '/product',
+          to: '/product/dog',
         },
         {
           icon: 'mdi-format-list-checkbox',

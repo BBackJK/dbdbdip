@@ -20,7 +20,9 @@
           <v-card-actions>
             <v-row no-gutters>
               <v-col cols="3" v-if="userInfo">
-                <v-btn color="orange" text @click="onUserCart(item)">Cart</v-btn>
+                <v-btn color="orange" text @click="onUserCart(item)"
+                  >Cart</v-btn
+                >
               </v-col>
               <v-col cols="3" v-else>
                 <v-btn color="orange" text @click="onCart(item)">Cart</v-btn>
@@ -32,7 +34,16 @@
       </v-col>
     </v-row>
     <v-row dense>
-      <v-btn v-if="admin" color="red" fab large dark bottom right @click="onAddProduct">
+      <v-btn
+        v-if="admin"
+        color="red"
+        fab
+        large
+        dark
+        bottom
+        right
+        @click="onAddProduct"
+      >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-row>
@@ -54,7 +65,10 @@ export default {
   },
   mounted() {
     if (!this.items) {
-      this.$store.dispatch('product/getItemProducts', this.$route.name.split('-')[1]);
+      this.$store.dispatch(
+        'product/getItemProducts',
+        this.$route.name.split('-')[1]
+      );
     }
   },
   computed: {
@@ -71,56 +85,62 @@ export default {
     onUserCart(item) {
       this.snackbar = false;
 
-        console.log(item);
-        const postData = {
-          orderQuantity: 1,
-          user_id: this.userInfo.id,
-          product_id: item.id,
-        }
+      console.log(item);
+      const postData = {
+        orderQuantity: 1,
+        user_id: this.userInfo.id,
+        product_id: item.id,
+      };
 
-        this.$store.dispatch('cart/createCartData', postData);
+      this.$store.dispatch('cart/createCartData', postData);
 
-        if (this.inCarted) {
-          this.$store.dispatch('cart/modifyCreatedFlag');
-          this.title = 'Complete Carting';
-          this.snackbar = true;
+      if (this.inCarted) {
+        this.$store.dispatch('cart/modifyCreatedFlag');
+        this.title = 'Complete Carting';
+        this.snackbar = true;
 
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
+        const time = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
             clearInterval(time);
-            }
-          }, 5000);
-        }
+          }
+        }, 5000);
+      }
 
-        if(!this.inCarted && this.message === 'Conflict') {
-          this.title = 'Duplicated Items!';
-          this.snackbar = true;
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
-              clearInterval(time);
-            }
-          }, 5000);
-          return;
-        }
+      if (!this.inCarted && this.message === 'Conflict') {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+        const time = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time);
+          }
+        }, 5000);
+      }
     },
     onCart(item) {
-      this.$store.dispatch('cart/pushCartData', item);
+      const data = {
+        orderQuantity: 1,
+        product: item,
+      };
 
-      for (let i = 0; i < this.cartItems.length; i++) {
-        if (item.name === this.cartItems[i].name) {
-          this.title = 'Duplicated Items!';
-          this.snackbar = true;
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
-              clearInterval(time);
-            }
-          }, 5000);
-          return;
-        }
+      const idx = this.cartItems.findIndex((i) => {
+        return i.product.id === item.id;
+      });
+
+      if (idx > -1) {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+        const time = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time);
+          }
+        }, 5000);
+        return;
       }
+
+      this.$store.dispatch('cart/pushCartData', data);
 
       this.title = 'Complete Carting';
       this.snackbar = true;

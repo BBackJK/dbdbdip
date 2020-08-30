@@ -22,16 +22,13 @@
         </span>
       </v-card-text>
       <v-card-actions>
-        <v-btn
-          color="orange"
-          text
-          class="mr-14"
-          @click="onOrder(selectItem)"
-        >
+        <v-btn color="orange" text class="mr-14" @click="onOrder(selectItem)">
           Order
         </v-btn>
-        <v-btn color="orange" text @click="onUserCart(item)" v-if="userInfo">Cart</v-btn>
-        <v-btn color="orange" text @click="onCart(selectItem)" v-else>
+        <v-btn v-if="userInfo" color="orange" text @click="onUserCart(item)"
+          >Cart</v-btn
+        >
+        <v-btn v-else color="orange" text @click="onCart(selectItem)">
           Cart
         </v-btn>
 
@@ -63,84 +60,88 @@ import { mapState } from 'vuex';
 import Snackbar from '@/components/Snackbar.vue';
 
 export default {
+  components: {
+    Snackbar,
+  },
   data: () => ({
     show: false,
     orderQuantity: 1,
     snackbar: false,
     title: '',
   }),
-  created() {
-    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
-    this.$store.dispatch('product/getProductById', this.$route.params.id);
-  },
-  components: {
-    Snackbar,
-  },
   computed: {
     ...mapState({
       selectItem: (state) => state.product.selectItem,
       cartItems: (state) => state.cart.cartItems,
-      dogItems: (state) => state.product.dogItems,
-      admin: (state) => state.user.admin,
       userInfo: (state) => state.user.userInfo,
       inCarted: (state) => state.cart.inCarted,
       message: (state) => state.cart.message,
     }),
   },
+  created() {
+    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
+    this.$store.dispatch('product/getProductById', this.$route.params.id);
+  },
   methods: {
     onUserCart(item) {
       this.snackbar = false;
 
-        console.log(item);
-        const postData = {
-          orderQuantity: 1,
-          user_id: this.userInfo.id,
-          product_id: item.id,
-        }
+      const postData = {
+        orderQuantity: this.orderQuantity,
+        user_id: this.userInfo.id,
+        product_id: item.id,
+      };
 
-        this.$store.dispatch('cart/createCartData', postData);
+      this.$store.dispatch('cart/createCartData', postData);
 
-        if (this.inCarted) {
-          this.$store.dispatch('cart/modifyCreatedFlag');
-          this.title = 'Complete Carting';
-          this.snackbar = true;
+      if (this.inCarted) {
+        this.$store.dispatch('cart/modifyCreatedFlag');
+        this.title = 'Complete Carting';
+        this.snackbar = true;
 
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
+        const time = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
             clearInterval(time);
-            }
-          }, 5000);
-        }
+          }
+        }, 5000);
+      }
 
-        if(!this.inCarted && this.message === 'Conflict') {
-          this.title = 'Duplicated Items!';
-          this.snackbar = true;
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
-              clearInterval(time);
-            }
-          }, 5000);
-          return;
-        }
+      if (!this.inCarted && this.message === 'Conflict') {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+        const time = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time);
+          }
+        }, 5000);
+      }
     },
     onCart(item) {
-      this.$store.dispatch('cart/pushCartData', item);
+      const data = {
+        orderQuantity: this.orderQuantity,
+        product: item,
+      };
+      // item.orderQuantity = this.orderQuantity;
 
-      for (let i = 0; i < this.cartItems.length; i++) {
-        if (item.name === this.cartItems[i].name) {
-          this.title = 'Duplicated Items!';
-          this.snackbar = true;
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
-              clearInterval(time);
-            }
-          }, 5000);
-          return;
-        }
+      const idx = this.cartItems.findIndex((i) => {
+        return i.product.id === item.id;
+      });
+
+      if (idx > -1) {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+        const time = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time);
+          }
+        }, 5000);
+        return;
       }
+
+      this.$store.dispatch('cart/pushCartData', data);
 
       this.title = 'Complete Carting';
       this.snackbar = true;

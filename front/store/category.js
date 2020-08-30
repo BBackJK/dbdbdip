@@ -1,16 +1,16 @@
 export const state = () => ({
   categories: [
-    { 
+    {
       id: 1,
-      name: 'Dog'
+      name: 'Dog',
     },
     {
       id: 2,
-      name: 'Cat'
+      name: 'Cat',
     },
     {
       id: 3,
-      name: 'Item'
-    }
-  ]
-})
+      name: 'Item',
+    },
+  ],
+});

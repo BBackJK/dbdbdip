@@ -22,16 +22,17 @@
         </span>
       </v-card-text>
       <v-card-actions>
-        <v-btn
-          color="orange"
-          text
-          class="mr-14"
-          @click="onOrder(selectItem)"
-        >
+        <v-btn color="orange" text class="mr-14" @click="onOrder(selectItem)">
           Order
         </v-btn>
-
-        <v-btn color="orange" text @click="onCart(selectItem)">
+        <v-btn
+          v-if="userInfo"
+          color="orange"
+          text
+          @click="onUserCart(selectItem)"
+          >Cart</v-btn
+        >
+        <v-btn v-else color="orange" text @click="onCart(selectItem)">
           Cart
         </v-btn>
 
@@ -63,41 +64,92 @@ import { mapState } from 'vuex';
 import Snackbar from '@/components/Snackbar.vue';
 
 export default {
+  components: {
+    Snackbar,
+  },
   data: () => ({
     show: false,
     orderQuantity: 1,
     snackbar: false,
     title: '',
   }),
-  created() {
-    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
-    this.$store.dispatch('product/getProductById', this.$route.params.id);
-  },
-  components: {
-    Snackbar,
-  },
   computed: {
     ...mapState({
       selectItem: (state) => state.product.selectItem,
       cartItems: (state) => state.cart.cartItems,
+      message: (state) => state.cart.message,
+      inCarted: (state) => state.cart.inCarted,
+      userInfo: (state) => state.user.userInfo,
     }),
   },
+  created() {
+    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
+    this.$store.dispatch('product/getProductById', this.$route.params.id);
+  },
   methods: {
+    onUserCart(item) {
+      // this.snackbar = false;
+
+      const postData = {
+        orderQuantity: this.orderQuantity,
+        user_id: this.userInfo.id,
+        product_id: item.id,
+      };
+
+      this.$store.dispatch('cart/createCartData', postData);
+
+      console.log(this.inCarted);
+
+      // if (this.inCarted) {
+      //   console.log(this.inCarted);
+      //   this.$store.dispatch('cart/modifyCreatedFlag');
+      //   this.title = 'Complete Carting';
+      //   this.snackbar = true;
+
+      //   const time = setInterval(() => {
+      //     if (this.snackbar) {
+      //       this.snackbar = false;
+      //       clearInterval(time);
+      //     }
+      //   }, 5000);
+      // }
+
+      // if (!this.inCarted && this.message === 'Conflict') {
+      //   this.title = 'Duplicated Items!';
+      //   this.snackbar = true;
+      //   const time = setInterval(() => {
+      //     if (this.snackbar) {
+      //       this.snackbar = false;
+      //       clearInterval(time);
+      //     }
+      //   }, 5000);
+      // }
+    },
     onCart(item) {
-      for (let i = 0; i < this.cartItems.length; i++) {
-        if (item.name === this.cartItems[i].name) {
-          this.title = 'Duplicated Items!';
-          this.snackbar = true;
-          const time = setInterval(() => {
-            if (this.snackbar) {
-              this.snackbar = false;
-              clearInterval(time);
-            }
-          }, 5000);
-          return;
-        }
+      const data = {
+        orderQuantity: this.orderQuantity,
+        product: item,
+      };
+      // item.orderQuantity = this.orderQuantity;
+
+      const idx = this.cartItems.findIndex((i) => {
+        return i.product.id === item.id;
+      });
+
+      if (idx > -1) {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+        const time = setInterval(() => {
+          if (this.snackbar) {
+            this.snackbar = false;
+            clearInterval(time);
+          }
+        }, 5000);
+        return;
       }
-      item.orderQuantity = this.orderQuantity;
+
+      this.$store.dispatch('cart/pushCartData', data);
+
       this.title = 'Complete Carting';
       this.snackbar = true;
       const time = setInterval(() => {
@@ -106,8 +158,6 @@ export default {
           clearInterval(time);
         }
       }, 5000);
-
-      this.$store.dispatch('cart/pushCartData', item);
     },
     onOrder(item) {
       const orderItem = [];

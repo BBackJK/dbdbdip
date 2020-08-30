@@ -137,11 +137,13 @@ export const actions = {
       .post('/auth/login', loginData)
       .then((res) => {
         console.log(res);
-        localStorage.accessToken = res.data.data.token;
         if (res.data.data.user.email === 'admin') {
           commit('LOGIN_ADMIN_SUCCESS');
           return;
         }
+
+        localStorage.accessToken = res.data.data.token;
+
         const data = {
           message: 'success',
           userInfo: res.data.data.user,

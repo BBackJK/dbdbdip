@@ -1,58 +1,7 @@
 <template>
   <v-row align="center">
     <v-expansion-panels :multiple="true" :popout="true">
-
-      <v-expansion-panel v-if="!userInfo">
-
-        <v-expansion-panel-header>
-          <v-row no-gutters>
-            <v-col cols="8">
-              Product Order List
-            </v-col>
-            <v-col cols="3" class="text--secondary">
-              Total Price :
-              {{ totalPrice }} won
-            </v-col>
-          </v-row>
-        </v-expansion-panel-header>
-
-        <v-expansion-panel-content>
-          <v-list-item v-for="item in orderItems" :key="item.id">
-            <v-list-item-avatar>
-              <v-img :src="item.imagePath"></v-img>
-            </v-list-item-avatar>          
-
-            <v-list-item-content>
-              <v-list-item-title> Name </v-list-item-title>
-              <v-list-item-subtitle> {{ item.name }}</v-list-item-subtitle>
-            </v-list-item-content>
-
-            <v-list-item-content>
-              <v-list-item-title>Price</v-list-item-title>
-              <v-list-item-subtitle> {{ item.price }} won</v-list-item-subtitle>
-            </v-list-item-content>
-
-            <v-list-item-content>
-              <v-list-item-title>Quantity</v-list-item-title>
-              <v-list-item-subtitle>
-                {{ item.orderQuantity }} ea</v-list-item-subtitle
-              >
-            </v-list-item-content>
-
-            <v-list-item-content>
-              <v-list-item-title>Sub-Total</v-list-item-title>
-              <v-list-item-subtitle>
-                {{ item.orderQuantity * item.price * 1 }}
-                won</v-list-item-subtitle
-              >
-            </v-list-item-content>
-          </v-list-item>
-        </v-expansion-panel-content>
-
-      </v-expansion-panel>
-
-      <v-expansion-panel v-else>
-
+      <v-expansion-panel>
         <v-expansion-panel-header>
           <v-row no-gutters>
             <v-col cols="8">
@@ -69,35 +18,38 @@
           <v-list-item v-for="item in orderItems" :key="item.id">
             <v-list-item-avatar>
               <v-img :src="item.product.imagePath"></v-img>
-            </v-list-item-avatar>          
+            </v-list-item-avatar>
 
             <v-list-item-content>
               <v-list-item-title> Name </v-list-item-title>
-              <v-list-item-subtitle> {{ item.product.name }}</v-list-item-subtitle>
+              <v-list-item-subtitle>
+                {{ item.product.name }}</v-list-item-subtitle
+              >
             </v-list-item-content>
 
             <v-list-item-content>
               <v-list-item-title>Price</v-list-item-title>
-              <v-list-item-subtitle> {{ item.product.price }} won</v-list-item-subtitle>
+              <v-list-item-subtitle>
+                {{ item.product.price }} won</v-list-item-subtitle
+              >
             </v-list-item-content>
 
             <v-list-item-content>
               <v-list-item-title>Quantity</v-list-item-title>
               <v-list-item-subtitle>
-                {{ item.product.orderQuantity }} ea</v-list-item-subtitle
+                {{ item.orderQuantity }} ea</v-list-item-subtitle
               >
             </v-list-item-content>
 
             <v-list-item-content>
               <v-list-item-title>Sub-Total</v-list-item-title>
               <v-list-item-subtitle>
-                {{ item.product.orderQuantity * item.product.price * 1 }}
+                {{ item.orderQuantity * item.product.price * 1 }}
                 won</v-list-item-subtitle
               >
             </v-list-item-content>
           </v-list-item>
         </v-expansion-panel-content>
-
       </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-header>
@@ -105,10 +57,10 @@
             <v-col cols="24">
               Order User Info
             </v-col>
-            <v-col cols="6" class="text--secondary" v-if="this.name === ''">
+            <v-col v-if="name === ''" cols="6" class="text--secondary">
               Order User name : Write Your name
             </v-col>
-            <v-col cols="4" class="text--secondary" v-else>
+            <v-col v-else cols="4" class="text--secondary">
               Order User name :
               {{ orderUsername }}
             </v-col>
@@ -167,17 +119,6 @@ export default {
       address: '',
     };
   },
-  mounted() {
-    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
-
-    if (this.userInfo) {
-      this.name = this.userInfo.name,
-      this.email = this.userInfo.email,
-      this.phone = this.userInfo.phone,
-      this.zipcode = this.userInfo.zipcode,
-      this.address = this.userInfo.address
-    }
-  },
   computed: {
     ...mapState({
       orderItems: (state) => state.order.orderItems,
@@ -188,17 +129,41 @@ export default {
       return this.name;
     },
   },
+  mounted() {
+    console.log(this.orderItems);
+    console.log(this.totalPrice);
+    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
+
+    if (this.userInfo) {
+      // eslint-disable-next-line no-unused-expressions
+      (this.name = this.userInfo.name),
+        (this.email = this.userInfo.email),
+        (this.phone = this.userInfo.phone),
+        (this.zipcode = this.userInfo.zipcode),
+        (this.address = this.userInfo.address);
+    }
+  },
   methods: {
     onClickTest() {
       console.log('click!!');
-      const orderData = {
+      const orderUserData = {
         name: this.name,
         email: this.email,
         phone: this.phone,
         zipcode: this.zipcode,
         address: this.address,
       };
-      console.log(orderData);
+      const orderProductData = {};
+
+      orderProductData.orderQuantitys = [];
+      orderProductData.productIds = [];
+      for (let i = 0; i < this.orderItems.length; i++) {
+        orderProductData.orderQuantitys.push(this.orderItems[i].orderQuantity);
+        orderProductData.productIds.push(this.orderItems[i].product.id);
+      }
+
+      console.log(orderUserData);
+      console.log(orderProductData);
     },
   },
 };
