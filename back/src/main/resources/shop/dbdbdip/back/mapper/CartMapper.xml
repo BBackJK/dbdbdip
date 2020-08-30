@@ -49,6 +49,15 @@
 			(#{orderQuantity},  #{user_id}, #{product_id})
 	</insert>
 	
+	<update id="deleteCart" parameterType="CartDeleteModel">
+		UPDATE 
+			cart
+		SET
+			deletedAt = #{deletedAt}
+		WHERE
+			id = #{id} and deletedAt is null
+	</update>
+	
 	<select id="checkProductId" parameterType="Integer" resultMap="CartResultMap">
 		SELECT
 			*

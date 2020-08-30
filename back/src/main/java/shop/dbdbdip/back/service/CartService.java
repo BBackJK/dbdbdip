@@ -9,5 +9,7 @@ public interface CartService {
 	
 	int postCart(CartCreateDto cart);
 	
+	int deleteCart(int id);
+	
 	List<CartModel> getByUserId(int userId);
 }

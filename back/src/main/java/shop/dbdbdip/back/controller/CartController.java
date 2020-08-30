@@ -54,4 +54,21 @@ public class CartController {
 		
 		return message;
 	}
+	
+	@RequestMapping(value="/remove", method=RequestMethod.DELETE)
+	public ResponseMessage delete(@RequestParam("id") int id) {
+		
+		int result = cartService.deleteCart(id);
+		
+		if (result != 1) {
+			
+			ResponseMessage message = new ResponseMessage(HttpStatus.CONFLICT);
+			
+			return message;
+		}
+		
+		ResponseMessage message = new ResponseMessage(HttpStatus.OK);
+		
+		return message;
+	}
 }
