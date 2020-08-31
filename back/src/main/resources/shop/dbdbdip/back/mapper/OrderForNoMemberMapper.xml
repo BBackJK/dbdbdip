@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace="shop.dbdbdip.back.mapper.OrderForNoMemberMapper">
+	<insert id ="insertOrder" parameterType="List">
+		INSERT INTO
+			orderForNoMember
+			(orderNumber, orderQuantity, totalPrice, username, userEmail, userPhone, userZipcode, userAddress, product_id)
+		VALUES
+			<foreach collection="list" item="item" separator=",">
+				(#{item.orderNumber}, #{item.orderQuantity}, #{item.totalPrice}, #{item.username}, #{item.userEmail}, #{item.userPhone}, #{item.userZipcode}, #{item.userAddress}, #{item.product_id})
+			</foreach>
+	</insert>
+</mapper>
