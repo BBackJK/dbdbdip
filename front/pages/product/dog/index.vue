@@ -75,6 +75,19 @@ export default {
       message: (state) => state.cart.message,
     }),
   },
+  watch: {
+    message(val) {
+      this.snackbar = false;
+      if (val === 'Success') {
+        this.title = 'Complete Carting';
+        this.snackbar = true;
+      }
+      if (val === 'Conflict') {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+      }
+    },
+  },
   created() {
     this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
   },
@@ -88,7 +101,7 @@ export default {
   },
   methods: {
     onUserCart(item) {
-      this.snackbar = false;
+      this.$store.dispatch('cart/modifyCreatedFlag');
 
       const postData = {
         orderQuantity: 1,
@@ -97,32 +110,10 @@ export default {
       };
 
       this.$store.dispatch('cart/createCartData', postData);
-
-      if (this.inCarted) {
-        this.$store.dispatch('cart/modifyCreatedFlag');
-        this.title = 'Complete Carting';
-        this.snackbar = true;
-
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
-
-      if (!this.inCarted && this.message === 'Conflict') {
-        this.title = 'Duplicated Items!';
-        this.snackbar = true;
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
     },
     onCart(item) {
+      this.snackbar = false;
+
       const data = {
         orderQuantity: 1,
         product: item,
@@ -135,12 +126,6 @@ export default {
       if (idx > -1) {
         this.title = 'Duplicated Items!';
         this.snackbar = true;
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
         return;
       }
 
@@ -148,15 +133,8 @@ export default {
 
       this.title = 'Complete Carting';
       this.snackbar = true;
-      const time = setInterval(() => {
-        if (this.snackbar) {
-          this.snackbar = false;
-          clearInterval(time);
-        }
-      }, 5000);
     },
     onProductDetail(item) {
-      console.log(item);
       this.$router.push(`/product/dog/${item.id}`);
     },
     onAddProduct() {

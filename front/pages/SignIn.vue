@@ -2,9 +2,9 @@
   <div class="container">
     <form>
       <v-text-field
+        ref="email"
         v-model="email"
         label="E-mail"
-        ref="email"
         required
       ></v-text-field>
       <v-text-field
@@ -16,7 +16,7 @@
         @click:append="show = !show"
       ></v-text-field>
       <br />
-      <v-btn class="mr-4" @click="loginSubmit" color="primary">SIGN IN</v-btn>
+      <v-btn class="mr-4" color="primary" @click="loginSubmit">SIGN IN</v-btn>
       <v-btn @click="loginClear">CLEAR</v-btn>
       <br />
       <br />
@@ -83,22 +83,10 @@ export default {
         this.snackbar = true;
         this.dialog = false;
         this.title = 'Checking Email and Password !';
-        const time1 = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time1);
-          }
-        }, 5000);
       } else {
         this.snackbar = true;
         this.dialog = false;
         this.title = 'Unknown error! Repeat Sign In!';
-        const time2 = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time2);
-          }
-        }, 5000);
       }
     },
 

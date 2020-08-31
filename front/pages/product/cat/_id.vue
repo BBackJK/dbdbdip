@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="mx-auto" max-width="344" v-if="selectItem">
+    <v-card v-if="selectItem" class="mx-auto" max-width="344">
       <v-img :src="selectItem.imagePath" height="200px"></v-img>
 
       <v-card-title>
@@ -78,13 +78,26 @@ export default {
       message: (state) => state.cart.message,
     }),
   },
+  watch: {
+    message(val) {
+      this.snackbar = false;
+      if (val === 'Success') {
+        this.title = 'Complete Carting';
+        this.snackbar = true;
+      }
+      if (val === 'Conflict') {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+      }
+    },
+  },
   created() {
     this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
     this.$store.dispatch('product/getProductById', this.$route.params.id);
   },
   methods: {
     onUserCart(item) {
-      this.snackbar = false;
+      this.$store.dispatch('cart/modifyCreatedFlag');
 
       const postData = {
         orderQuantity: this.orderQuantity,
@@ -93,30 +106,6 @@ export default {
       };
 
       this.$store.dispatch('cart/createCartData', postData);
-
-      if (this.inCarted) {
-        this.$store.dispatch('cart/modifyCreatedFlag');
-        this.title = 'Complete Carting';
-        this.snackbar = true;
-
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
-
-      if (!this.inCarted && this.message === 'Conflict') {
-        this.title = 'Duplicated Items!';
-        this.snackbar = true;
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
     },
     onCart(item) {
       const data = {

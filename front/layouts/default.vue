@@ -140,6 +140,9 @@ import { mapState } from 'vuex';
 import Dialog from '@/components/Dialog.vue';
 
 export default {
+  components: {
+    Dialog,
+  },
   data() {
     return {
       clipped: false,
@@ -172,9 +175,6 @@ export default {
       inCarted: (state) => state.cart.inCarted,
     }),
   },
-  components: {
-    Dialog,
-  },
   mounted() {
     if (localStorage.accessToken !== undefined && !this.admin) {
       console.log('have a access token');
@@ -192,7 +192,6 @@ export default {
       this.$store.dispatch('user/logout');
     },
     onTabClick(name) {
-      // console.log(name.toLowerCase());
       this.$router.push(`/product/${name.toLowerCase()}`);
     },
   },

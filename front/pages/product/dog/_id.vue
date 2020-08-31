@@ -7,39 +7,42 @@
         class="white--text align-end"
       ></v-img>
 
-      <v-card-title>
-        {{ selectItem.name }}
-      </v-card-title>
+      <v-card-title>{{ selectItem.name }}</v-card-title>
 
-      <v-card-text class="product-right">
-        {{ selectItem.price }} won
-      </v-card-text>
+      <v-card-text class="product-right"
+        >{{ selectItem.price }} won</v-card-text
+      >
 
       <v-card-text>
         Quantity :
         <span class="product-right">
-          <v-btn x-small :disabled="orderQuantity === 1" @click="onDownQuantity"
-            ><v-icon>mdi-minus</v-icon></v-btn
+          <v-btn
+            x-small
+            :disabled="orderQuantity === 1"
+            @click="onDownQuantity"
           >
+            <v-icon>mdi-minus</v-icon>
+          </v-btn>
           {{ orderQuantity }}
-          <v-btn x-small @click="onUpQuantity"><v-icon>mdi-plus</v-icon></v-btn>
+          <v-btn x-small @click="onUpQuantity">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
         </span>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="orange" text class="mr-14" @click="onOrder(selectItem)">
-          Order
-        </v-btn>
+        <v-btn color="orange" text class="mr-14" @click="onOrder(selectItem)"
+          >Order</v-btn
+        >
         <v-btn
           v-if="userInfo"
           color="orange"
           text
           @click="onUserCart(selectItem)"
+          >Cart</v-btn
         >
-          Cart
-        </v-btn>
-        <v-btn v-else color="orange" text @click="onCart(selectItem)">
-          Cart
-        </v-btn>
+        <v-btn v-else color="orange" text @click="onCart(selectItem)"
+          >Cart</v-btn
+        >
 
         <v-spacer></v-spacer>
       </v-card-actions>
@@ -52,9 +55,7 @@
         <div v-show="show">
           <v-divider></v-divider>
 
-          <v-card-text>
-            {{ selectItem.description }}
-          </v-card-text>
+          <v-card-text>{{ selectItem.description }}</v-card-text>
         </div>
       </v-expand-transition>
     </v-card>
@@ -87,13 +88,26 @@ export default {
       userInfo: (state) => state.user.userInfo,
     }),
   },
+  watch: {
+    message(val) {
+      this.snackbar = false;
+      if (val === 'Success') {
+        this.title = 'Complete Carting';
+        this.snackbar = true;
+      }
+      if (val === 'Conflict') {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+      }
+    },
+  },
   created() {
     this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
     this.$store.dispatch('product/getProductById', this.$route.params.id);
   },
   methods: {
     onUserCart(item) {
-      this.snackbar = false;
+      this.$store.dispatch('cart/modifyCreatedFlag');
 
       const postData = {
         orderQuantity: this.orderQuantity,
@@ -102,30 +116,6 @@ export default {
       };
 
       this.$store.dispatch('cart/createCartData', postData);
-
-      if (this.inCarted) {
-        this.$store.dispatch('cart/modifyCreatedFlag');
-        this.title = 'Complete Carting';
-        this.snackbar = true;
-
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
-
-      if (!this.inCarted && this.message === 'Conflict') {
-        this.title = 'Duplicated Items!';
-        this.snackbar = true;
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
     },
     onCart(item) {
       const data = {

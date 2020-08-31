@@ -90,6 +90,10 @@ import Snackbar from '@/components/Snackbar.vue';
 import Dialog from '@/components/Dialog.vue';
 
 export default {
+  components: {
+    Snackbar,
+    Dialog,
+  },
   mixins: [validationMixin],
 
   validations: {
@@ -125,11 +129,6 @@ export default {
         return phoneValid;
       },
     },
-  },
-
-  components: {
-    Snackbar,
-    Dialog,
   },
   data() {
     return {
@@ -259,22 +258,10 @@ export default {
         this.snackbar = true;
         this.dialog = false;
         this.title = 'Already Exist Email !!';
-        const time1 = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time1);
-          }
-        }, 5000);
       } else {
         this.snackbar = true;
         this.dialog = false;
         this.title = 'Unknown Error! Repeat Sign Up!';
-        const time2 = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time2);
-          }
-        }, 5000);
       }
     },
     signupClear() {

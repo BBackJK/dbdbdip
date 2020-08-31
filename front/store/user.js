@@ -64,6 +64,9 @@ export const mutations = {
     state.loggedIn = false;
     state.userInfo = null;
   },
+  MODIFY_UPDATED_FLAG(state) {
+    state.updated = false;
+  },
 };
 
 export const actions = {
@@ -179,6 +182,9 @@ export const actions = {
         console.log(err);
         commit('GET_INFO_ME_FAILURE');
       });
+  },
+  onModifyUpdatedFlag({ commit }) {
+    commit('MODIFY_UPDATED_FLAG');
   },
   logout({ commit }) {
     localStorage.removeItem('accessToken');

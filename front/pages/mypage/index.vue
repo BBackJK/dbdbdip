@@ -55,24 +55,10 @@ export default {
       snackbar: false,
     };
   },
-  mounted() {
-    console.log(this.userInfo);
-
-    this.email = this.userInfo.email;
-    this.name = this.userInfo.name;
-    this.phone = this.userInfo.phone;
-    this.zipcode = this.userInfo.zipcode;
-    this.address = this.userInfo.address;
-
-    const date = !this.userInfo.updatedAt
-      ? formatDate(this.userInfo.createdAt)
-      : formatDate(this.userInfo.updatedAt);
-
-    this.updatedAt = date;
-  },
   computed: {
     ...mapState({
       userInfo: (state) => state.user.userInfo,
+      updated: (state) => state.user.updated,
     }),
     updatableButton() {
       if (
@@ -87,6 +73,27 @@ export default {
       }
     },
   },
+  watch: {
+    updated(val) {
+      if (val) {
+        this.snackbar = true;
+        this.updatedAt = formatDate(this.userInfo.updatedAt);
+      }
+    },
+  },
+  mounted() {
+    this.email = this.userInfo.email;
+    this.name = this.userInfo.name;
+    this.phone = this.userInfo.phone;
+    this.zipcode = this.userInfo.zipcode;
+    this.address = this.userInfo.address;
+
+    const date = !this.userInfo.updatedAt
+      ? formatDate(this.userInfo.createdAt)
+      : formatDate(this.userInfo.updatedAt);
+
+    this.updatedAt = date;
+  },
   methods: {
     onMyPageClear() {
       this.name = '';
@@ -95,6 +102,10 @@ export default {
       this.address = '';
     },
     onSubmitInfoUpdate() {
+      this.$store.dispatch('user/onModifyUpdatedFlag');
+
+      this.snackbar = false;
+
       const putData = {
         email: this.email,
         name: this.name,
@@ -104,17 +115,6 @@ export default {
       };
 
       this.$store.dispatch('user/updateUserInfo', putData);
-
-      if (this.$store.state.user.updated) {
-        this.snackbar = true;
-        this.createdAt = formatDate(this.userInfo.updatedAt);
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
     },
   },
 };

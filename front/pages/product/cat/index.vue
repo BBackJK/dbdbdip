@@ -19,12 +19,12 @@
           </div>
           <v-card-actions>
             <v-row no-gutters>
-              <v-col cols="3" v-if="userInfo">
+              <v-col v-if="userInfo" cols="3">
                 <v-btn color="orange" text @click="onUserCart(item)"
                   >Cart</v-btn
                 >
               </v-col>
-              <v-col cols="3" v-else>
+              <v-col v-else cols="3">
                 <v-btn color="orange" text @click="onCart(item)">Cart</v-btn>
               </v-col>
             </v-row>
@@ -60,17 +60,6 @@ export default {
       title: '',
     };
   },
-  created() {
-    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
-  },
-  mounted() {
-    if (!this.catItems) {
-      this.$store.dispatch(
-        'product/getCatProducts',
-        this.$route.name.split('-')[1]
-      );
-    }
-  },
   computed: {
     ...mapState({
       catItems: (state) => state.product.catItems,
@@ -81,11 +70,35 @@ export default {
       message: (state) => state.cart.message,
     }),
   },
+  watch: {
+    message(val) {
+      this.snackbar = false;
+      if (val === 'Success') {
+        this.title = 'Complete Carting';
+        this.snackbar = true;
+      }
+      if (val === 'Conflict') {
+        this.title = 'Duplicated Items!';
+        this.snackbar = true;
+      }
+    },
+  },
+  created() {
+    this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
+  },
+
+  mounted() {
+    if (!this.catItems) {
+      this.$store.dispatch(
+        'product/getCatProducts',
+        this.$route.name.split('-')[1]
+      );
+    }
+  },
   methods: {
     onUserCart(item) {
-      this.snackbar = false;
+      this.$store.dispatch('cart/modifyCreatedFlag');
 
-      console.log(item);
       const postData = {
         orderQuantity: 1,
         user_id: this.userInfo.id,
@@ -93,32 +106,10 @@ export default {
       };
 
       this.$store.dispatch('cart/createCartData', postData);
-
-      if (this.inCarted) {
-        this.$store.dispatch('cart/modifyCreatedFlag');
-        this.title = 'Complete Carting';
-        this.snackbar = true;
-
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
-
-      if (!this.inCarted && this.message === 'Conflict') {
-        this.title = 'Duplicated Items!';
-        this.snackbar = true;
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
-      }
     },
     onCart(item) {
+      this.snackbar = false;
+
       const data = {
         orderQuantity: 1,
         product: item,
@@ -131,12 +122,6 @@ export default {
       if (idx > -1) {
         this.title = 'Duplicated Items!';
         this.snackbar = true;
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
         return;
       }
 
@@ -144,15 +129,8 @@ export default {
 
       this.title = 'Complete Carting';
       this.snackbar = true;
-      const time = setInterval(() => {
-        if (this.snackbar) {
-          this.snackbar = false;
-          clearInterval(time);
-        }
-      }, 5000);
     },
     onProductDetail(item) {
-      console.log(item);
       this.$router.push(`/product/cat/${item.id}`);
     },
     onAddProduct() {

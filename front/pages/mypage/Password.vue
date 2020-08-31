@@ -2,9 +2,9 @@
   <v-container fluid>
     <form>
       <v-text-field
+        ref="oldPassword"
         v-model="oldPassword"
         label="Origin Password"
-        ref="oldPassword"
         :error-messages="passwordErrors"
         :append-icon="oldPasswordShow ? 'mdi-eye' : 'mdi-eye-off'"
         :type="oldPasswordShow ? 'text' : 'password'"
@@ -99,6 +99,19 @@ export default {
       sameAsPassword: sameAs('newPassword'),
     },
   },
+  data() {
+    return {
+      oldPasswordShow: false,
+      newPasswordShow: false,
+      newPasswordCheckShow: false,
+      snackbar: false,
+      dialog: false,
+      oldPassword: '',
+      newPassword: '',
+      newPasswordCheck: '',
+      title: '',
+    };
+  },
   computed: {
     ...mapState({
       userInfo: (state) => state.user.userInfo,
@@ -153,21 +166,10 @@ export default {
       return errors;
     },
   },
-  data() {
-    return {
-      oldPasswordShow: false,
-      newPasswordShow: false,
-      newPasswordCheckShow: false,
-      snackbar: false,
-      dialog: false,
-      oldPassword: '',
-      newPassword: '',
-      newPasswordCheck: '',
-      title: '',
-    };
-  },
   methods: {
     async onUpdatePassword() {
+      this.snackbar = false;
+
       const putData = {
         email: this.userInfo.email,
         oldPassword: this.oldPassword,
@@ -185,12 +187,6 @@ export default {
         this.dialog = false;
         this.title = this.message;
         this.$refs.oldPassword.focus();
-        const time = setInterval(() => {
-          if (this.snackbar) {
-            this.snackbar = false;
-            clearInterval(time);
-          }
-        }, 5000);
       }
     },
   },

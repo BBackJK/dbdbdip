@@ -37,12 +37,11 @@ export const mutations = {
 
   /** 회원 카트 */
   /** cart post */
-  CREATE_CART_DATA_SUCCESS(state) {
+  CREATE_CART_DATA_SUCCESS(state, data) {
     state.inCarted = true;
-    state.message = '';
+    state.message = data;
   },
   CREATE_CART_DATA_FAILURE(state, data) {
-    state.inCarted = false;
     state.message = data;
   },
   GET_CART_DATA_SUCCESS(state, data) {
@@ -63,7 +62,6 @@ export const mutations = {
     state.deleted = false;
   },
   MODIFY_CREATED_FLAG(state) {
-    state.inCarted = !state.inCarted;
     state.message = '';
   },
 };
@@ -93,7 +91,7 @@ export const actions = {
           return;
         }
 
-        commit('CREATE_CART_DATA_SUCCESS');
+        commit('CREATE_CART_DATA_SUCCESS', 'Success');
       })
       .catch((err) => {
         console.log(err);
