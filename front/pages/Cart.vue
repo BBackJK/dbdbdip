@@ -8,7 +8,7 @@
           noCartProduct
         }}</v-list-item>
 
-        <v-list-item v-for="(item, index) in cartItems" :key="item.id">
+        <v-list-item v-for="item in cartItems" :key="item.id">
           <template>
             <v-list-item-avatar>
               <v-img :src="item.product.imagePath"></v-img>
@@ -28,12 +28,12 @@
               <v-btn
                 x-small
                 :disabled="item.orderQuantity === 1"
-                @click="onDownQuantity(item.id)"
+                @click="onDownQuantity(item.product.id)"
               >
                 <v-icon>mdi-minus</v-icon>
               </v-btn>
               {{ item.orderQuantity }}
-              <v-btn x-small @click="onUpQuantity(item.id)">
+              <v-btn x-small @click="onUpQuantity(item.product.id)">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
             </v-list-item-subtitle>

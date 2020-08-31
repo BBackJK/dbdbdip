@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialogFlag" max-width="290" v-if="!resetFlag">
+    <v-dialog v-if="!resetFlag" v-model="dialogFlag" max-width="290">
       <v-card>
         <v-card-title class="headline">{{ headline }}</v-card-title>
 
@@ -17,7 +17,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogFlag" max-width="290" v-if="resetFlag">
+    <v-dialog v-if="resetFlag" v-model="dialogFlag" max-width="290">
       <v-card>
         <v-card-title class="headline">{{ headline }}</v-card-title>
         <v-card-actions>

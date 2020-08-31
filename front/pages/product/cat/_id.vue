@@ -25,7 +25,11 @@
         <v-btn color="orange" text class="mr-14" @click="onOrder(selectItem)">
           Order
         </v-btn>
-        <v-btn v-if="userInfo" color="orange" text @click="onUserCart(item)"
+        <v-btn
+          v-if="userInfo"
+          color="orange"
+          text
+          @click="onUserCart(selectItem)"
           >Cart</v-btn
         >
         <v-btn v-else color="orange" text @click="onCart(selectItem)">
