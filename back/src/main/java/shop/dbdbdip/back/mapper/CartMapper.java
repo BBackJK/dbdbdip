@@ -13,6 +13,8 @@ public interface CartMapper {
 	CartModel checkProductId(int productId);
 	
 	int deleteCart(CartDeleteModel cart);
+	
+	int bulkDeleteCart(List<CartDeleteModel> cart);
  
 	List<CartModel> selectByUserId(int userId);
 

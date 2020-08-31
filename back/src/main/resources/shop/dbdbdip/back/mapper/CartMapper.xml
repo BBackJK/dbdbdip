@@ -6,7 +6,7 @@
 <mapper namespace="shop.dbdbdip.back.mapper.CartMapper">
 
 	<resultMap type="UserResponseModel" id="UserResultMap">
-		<result property="id" column="id" />
+		<result property="id" column="user_id" />
 		<result property="email" column="email" />
 		<result property="phone" column="phone" />
 		<result property="name" column="name" />
@@ -18,7 +18,7 @@
 	</resultMap>
 	
 	<resultMap type="ProductModel" id="ProductResultMap">
-		<result property="id" column="id" />
+		<result property="id" column="product_id" />
 		<result property="name" column="name" />
 		<result property="category" column="category" />
 		<result property="price" column="price" />
@@ -56,6 +56,23 @@
 			deletedAt = #{deletedAt}
 		WHERE
 			id = #{id} and deletedAt is null
+	</update>
+	
+	<update id="bulkDeleteCart" parameterType="List">
+		UPDATE
+			cart
+		SET
+			deletedAt = (CASE cart.product_id
+			<foreach collection="list" item="item" separator=" ">
+				WHEN #{item.id} THEN #{item.deletedAt}
+			</foreach> 
+			END)
+		where cart.product_id in (
+			<foreach collection="list" item="item" separator=",">
+			#{item.id}
+			</foreach>
+			
+		) and deletedAt is null
 	</update>
 	
 	<select id="checkProductId" parameterType="Integer" resultMap="CartResultMap">
