@@ -4,6 +4,46 @@
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 		
 <mapper namespace="shop.dbdbdip.back.mapper.OrderMapper">
+
+	<resultMap type="UserResponseModel" id="UserResultMap">
+		<result property="id" column="user_id" />
+		<result property="email" column="email" />
+		<result property="phone" column="phone" />
+		<result property="name" column="name" />
+		<result property="zipcode" column="zipcode" />
+		<result property="address" column="address" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+	</resultMap>
+	
+	<resultMap type="ProductModel" id="ProductResultMap">
+		<result property="id" column="product_id" />
+		<result property="name" column="name" />
+		<result property="category" column="category" />
+		<result property="price" column="price" />
+		<result property="imagePath" column="imagePath" />
+		<result property="description" column="description" />
+		<result property="quantity" column="quantity" />
+		<result property="sellable" column="sellable" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+	</resultMap>
+	
+	<resultMap type="OrderResponseModel" id="OrderResultMap">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="orderNumber" />
+		<result property="orderQuantity" column="orderQuantity" />
+		<result property="totalPrice" column="totalPrice" />
+		<result property="status" column="status" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+		<collection property="user" resultMap="UserResultMap" />
+		<collection property="product" resultMap="ProductResultMap"/>
+	</resultMap>
+	
 	<insert id ="insertOrder" parameterType="List">
 		INSERT INTO
 			orders
@@ -13,4 +53,23 @@
 				(#{item.orderNumber}, #{item.orderQuantity}, #{item.totalPrice}, #{item.user_id}, #{item.product_id})
 			</foreach>
 	</insert>
+	
+	<select id="selectById" parameterType="Integer" resultMap="OrderResultMap">
+		SELECT
+			*
+		FROM
+			orders
+		JOIN product AS p
+		ON p.id = orders.product_id
+		WHERE orders.user_id = #{userId}
+	</select>
+	<select id="selectByDate" parameterType="OrderGetByDateModel" resultMap="OrderResultMap">
+		SELECT
+			*
+		FROM
+			orders
+		JOIN product AS p
+		ON p.id = orders.product_id
+		WHERE orders.user_id = #{userId} and orders.createdAt LIKE CONCAT(#{searchDate}, '%')
+	</select>
 </mapper>

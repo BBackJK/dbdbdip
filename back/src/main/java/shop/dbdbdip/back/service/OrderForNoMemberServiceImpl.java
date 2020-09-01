@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import shop.dbdbdip.back.dto.order.OrderForNoMemberCreateDto;
 import shop.dbdbdip.back.mapper.OrderForNoMemberMapper;
+import shop.dbdbdip.back.model.order.OrderForNoMemberResponseModel;
 
 @Service
 public class OrderForNoMemberServiceImpl implements OrderForNoMemberService {
@@ -21,7 +22,16 @@ public class OrderForNoMemberServiceImpl implements OrderForNoMemberService {
 		
 		int result = orderForNoMemberMapper.insertOrder(orders);
 		
-		return 0;
+		return result;
 	}
 
+	@Override
+	public List<OrderForNoMemberResponseModel> getByOrderNumber(String orderNumber) {
+		
+		List<OrderForNoMemberResponseModel> orders = orderForNoMemberMapper.selectByOrderNumber(orderNumber);
+		
+		return orders;
+	}
+
+	
 }

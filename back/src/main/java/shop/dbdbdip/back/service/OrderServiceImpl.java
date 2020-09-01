@@ -12,6 +12,8 @@ import shop.dbdbdip.back.dto.order.OrderCreateDto;
 import shop.dbdbdip.back.mapper.CartMapper;
 import shop.dbdbdip.back.mapper.OrderMapper;
 import shop.dbdbdip.back.model.cart.CartDeleteModel;
+import shop.dbdbdip.back.model.order.OrderGetByDateModel;
+import shop.dbdbdip.back.model.order.OrderResponseModel;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -47,6 +49,22 @@ public class OrderServiceImpl implements OrderService {
 		return result;
 	}
 	
+	@Override
+	public List<OrderResponseModel> getById(int userId) {
+
+		List<OrderResponseModel> orders = orderMapper.selectById(userId);
+		
+		return orders;
+	}
+	
+	@Override
+	public List<OrderResponseModel> getByDate(OrderGetByDateModel order) {
+		
+		List<OrderResponseModel> orders = orderMapper.selectByDate(order);
+		
+		return orders;
+	}
+	
 	private String getDate() {
 		
 		Date today = new Date();
@@ -57,5 +75,4 @@ public class OrderServiceImpl implements OrderService {
 		
 		return date;
 	}
-
 }

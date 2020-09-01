@@ -4,6 +4,38 @@
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 		
 <mapper namespace="shop.dbdbdip.back.mapper.OrderForNoMemberMapper">
+
+	<resultMap type="ProductModel" id="ProductResultMap">
+		<result property="id" column="product_id" />
+		<result property="name" column="name" />
+		<result property="category" column="category" />
+		<result property="price" column="price" />
+		<result property="imagePath" column="imagePath" />
+		<result property="description" column="description" />
+		<result property="quantity" column="quantity" />
+		<result property="sellable" column="sellable" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+	</resultMap>
+	
+	<resultMap type="OrderForNoMemberResponseModel" id="OrderForNoMemberResultMap">
+		<result property="id" column="id" />
+		<result property="orderNumber" column="orderNumber" />
+		<result property="orderQuantity" column="orderQuantity" />
+		<result property="totalPrice" column="totalPrice" />
+		<result property="status" column="status" />
+		<result property="username" column="username" />
+		<result property="userEmail" column="userEmail" />
+		<result property="userPhone" column="userPhone" />
+		<result property="userZipcode" column="userZipcode" />
+		<result property="userAddress" column="userAddress" />
+		<result property="createdAt" column="createdAt" />
+		<result property="updatedAt" column="updatedAt" />
+		<result property="deletedAt" column="deletedAt" />
+		<collection property="product" resultMap="ProductResultMap"/>
+	</resultMap>
+
 	<insert id ="insertOrder" parameterType="List">
 		INSERT INTO
 			orderForNoMember
@@ -13,4 +45,13 @@
 				(#{item.orderNumber}, #{item.orderQuantity}, #{item.totalPrice}, #{item.username}, #{item.userEmail}, #{item.userPhone}, #{item.userZipcode}, #{item.userAddress}, #{item.product_id})
 			</foreach>
 	</insert>
+	<select id="selectByOrderNumber" parameterType="String" resultMap="OrderForNoMemberResultMap">
+		SELECT
+			*
+		FROM
+			orderfornomember
+		JOIN product AS p
+		ON p.id = orderfornomember.product_id
+		WHERE orderfornomember.orderNumber = #{orderNumber}
+	</select>
 </mapper>
