@@ -1,5 +1,6 @@
 export const state = () => ({
-  orderItems: null,
+  orderItems: null, // 결제 전 주문 데이터
+  orderedItems: null, // 주문 완료된 데이터
   totalPrice: 0,
   ordered: false,
   orderNumber: null,
@@ -17,6 +18,24 @@ export const mutations = {
   },
   POST_ORDER_DATA_FAILURE(state) {
     state.ordered = false;
+  },
+  GET_ORDER_BY_ID_SUCCESS(state, data) {
+    state.orderedItems = data;
+  },
+  GET_ORDER_BY_ID_FAILURE(state) {
+    state.orderedItems = null;
+  },
+  GET_ORDER_BY_NUMBER_SUCCESS(state, data) {
+    state.orderedItems = data;
+  },
+  GET_ORDER_BY_NUMBER_FAILURE(state) {
+    state.orderedItems = null;
+  },
+  GET_ORDER_BY_DATE_SUCCESS(state, data) {
+    state.orderedItems = data;
+  },
+  GET_ORDER_BY_DATE_FAILURE(state) {
+    state.orderedItems = false;
   },
   MODIFY_ORDER_FLAG(state) {
     state.ordered = false;
@@ -64,6 +83,55 @@ export const actions = {
       .catch((err) => {
         console.log(err);
         commit('POST_ORDER_FOR_NO_MEMBER_FAILURE');
+      });
+  },
+  getOrderById({ commit }, data) {
+    this.$axios
+      .get('/order', {
+        params: {
+          id: data,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        commit('GET_ORDER_BY_ID_SUCCESS', res.data.data.orders);
+      })
+      .catch((err) => {
+        console.log(err);
+        commit('GET_ORDER_BY_ID_FAILURE');
+      });
+  },
+  getOrderByNumber({ commit }, data) {
+    this.$axios
+      .get('/order/notuser', {
+        params: {
+          orderNumber: data,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        commit('GET_ORDER_BY_NUMBER_SUCCESS', res.data.data.orders);
+      })
+      .catch((err) => {
+        console.log(err);
+        commit('GET_ORDER_BY_NUMBER_FAILURE');
+      });
+  },
+  getOrderByDate({ commit }, data) {
+    this.$axios
+      .get('/order/date', {
+        params: {
+          date: data.date,
+          userId: data.id,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        commit('GET_ORDER_BY_DATE_SUCCESS', res.data.data.orders);
+      })
+      .catch((err) => {
+        console.log(err);
+        commit('GET_ORDER_BY_DATE_FAILURE');
       });
   },
   pushOrderNumber({ commit }, data) {
