@@ -19,7 +19,7 @@
               </v-toolbar-items>
             </v-toolbar>
           </v-row>
-          <v-row align="center">
+          <v-row v-if="userInfo" align="center">
             <v-date-picker
               v-model="date"
               full-width
@@ -28,25 +28,67 @@
           </v-row>
           <v-row>
             <v-spacer></v-spacer>
-            <v-btn x-large color="orange" text @click="test">Date Search</v-btn>
+            <v-btn
+              v-if="userInfo"
+              x-large
+              color="orange"
+              text
+              @click="onSearchDate"
+              >Date Search</v-btn
+            >
           </v-row>
         </v-col>
         <v-col>
-          <v-card max-width="450" class="mx-auto">
+          <v-card max-width="800" class="mx-auto">
+            <v-card-subtitle>Buying List</v-card-subtitle>
             <v-list three-line>
               <template>
-                <v-subheader> {{ date }}</v-subheader>
-                <v-list-item>
-                  <!-- <v-list-item-avatar>
-                    <v-img></v-img>
-                  </v-list-item-avatar>
+                <template v-if="orderedItems.length !== 0">
+                  <v-list-item
+                    v-for="item in orderedItems"
+                    :key="item.id"
+                    @click="test(item)"
+                  >
+                    <v-subheader>{{
+                      item.createdAt.substr(0, 10)
+                    }}</v-subheader>
+                    <v-list-item-avatar>
+                      <v-img :src="item.product.imagePath"></v-img>
+                    </v-list-item-avatar>
 
-                  <v-list-item-content>
-                    <v-list-item-title>test</v-list-item-title>
-                    <v-list-item-subtitle> sub title </v-list-item-subtitle>
-                  </v-list-item-content> -->
-                  No Data.
-                </v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.product.name }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle
+                        >{{ item.product.price }} won</v-list-item-subtitle
+                      >
+                    </v-list-item-content>
+
+                    <v-list-item-content>
+                      <v-list-item-title>Quantity</v-list-item-title>
+                      <v-list-item-subtitle
+                        >{{ item.orderQuantity }} ea</v-list-item-subtitle
+                      >
+                    </v-list-item-content>
+
+                    <v-list-item-content>
+                      <v-list-item-title>Sub Total Price</v-list-item-title>
+                      <v-list-item-subtitle>
+                        {{ item.orderQuantity * item.product.price * 1 }}
+                        won
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+
+                    <v-list-item-content>
+                      <v-list-item-title>Status</v-list-item-title>
+                      <v-list-item-subtitle>
+                        {{ item.status }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+                <template v-else>No Data.</template>
               </template>
             </v-list>
           </v-card>
@@ -58,34 +100,47 @@
 
 <script>
 import { mapState } from 'vuex';
+
 export default {
   data: () => ({
     title: 'Buying List',
-    date: new Date().toISOString().substr(0, 10),
+    date: '',
     searchNumber: '',
   }),
   computed: {
     ...mapState({
       userInfo: (state) => state.user.userInfo,
+      orderedItems: (state) => state.order.orderedItems,
+      getted: (state) => state.order.getted,
     }),
   },
   mounted() {
+    this.date = new Date().toISOString().substr(0, 10);
     if (this.userInfo) {
       this.$store.dispatch('order/getOrderById', this.userInfo.id);
     }
   },
+  destroyed() {
+    this.$store.dispatch('order/resetBuyingList');
+    this.$store.dispatch('order/resetGetted');
+  },
   methods: {
     onSearchNumber() {
+      this.$store.dispatch('order/resetGetted');
       console.log(this.searchNumber);
       this.$store.dispatch('order/getOrderByNumber', this.searchNumber);
     },
-    test() {
-      console.log(this.date);
+    onSearchDate() {
+      this.$store.dispatch('order/resetGetted');
       const getData = {
         date: this.date,
-        id: 2,
+        id: this.userInfo.id,
       };
       this.$store.dispatch('order/getOrderByDate', getData);
+    },
+    test(item) {
+      console.log(item);
+      this.$router.push(`/product/${item.product.category}/${item.product.id}`);
     },
   },
 };

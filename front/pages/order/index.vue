@@ -106,7 +106,7 @@
       v-if="dialog"
       :dialog-flag="dialog"
       headline="Order Success!"
-      link-title="Go Home!"
+      link-title="Check Order"
       link-push="/order/result"
     />
   </v-row>
@@ -153,6 +153,7 @@ export default {
     },
   },
   created() {
+    console.log(this.orderItems);
     this.$store.dispatch('page/getCurrentPage', this.$nuxt.$route.name);
 
     if (this.userInfo) {

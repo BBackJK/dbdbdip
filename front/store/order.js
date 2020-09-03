@@ -1,9 +1,10 @@
 export const state = () => ({
   orderItems: null, // 결제 전 주문 데이터
-  orderedItems: null, // 주문 완료된 데이터
+  orderedItems: [], // 주문 완료된 데이터
   totalPrice: 0,
   ordered: false,
   orderNumber: null,
+  getted: false,
 });
 
 export const mutations = {
@@ -20,28 +21,43 @@ export const mutations = {
     state.ordered = false;
   },
   GET_ORDER_BY_ID_SUCCESS(state, data) {
+    state.orderedItems = null;
     state.orderedItems = data;
+    state.getted = true;
   },
   GET_ORDER_BY_ID_FAILURE(state) {
-    state.orderedItems = null;
+    state.orderedItems = [];
+    state.getted = false;
   },
   GET_ORDER_BY_NUMBER_SUCCESS(state, data) {
+    state.orderedItems = null;
     state.orderedItems = data;
+    state.getted = true;
   },
   GET_ORDER_BY_NUMBER_FAILURE(state) {
-    state.orderedItems = null;
+    state.orderedItems = [];
+    state.getted = false;
   },
   GET_ORDER_BY_DATE_SUCCESS(state, data) {
+    state.orderedItems = null;
     state.orderedItems = data;
+    state.getted = true;
   },
   GET_ORDER_BY_DATE_FAILURE(state) {
-    state.orderedItems = false;
+    state.orderedItems = [];
+    state.getted = false;
   },
   MODIFY_ORDER_FLAG(state) {
     state.ordered = false;
   },
   PUSH_ORDER_NUMBER(state, data) {
     state.orderNumber = data;
+  },
+  RESET_BUYING_LIST(state) {
+    state.orderedItems = [];
+  },
+  RESET_GETTED(state) {
+    state.getted = false;
   },
 
   /** 비회원용 주문 */
@@ -139,5 +155,11 @@ export const actions = {
   },
   modifyOrderFlag({ commit }) {
     commit('MODIFY_ORDER_FLAG');
+  },
+  resetBuyingList({ commit }) {
+    commit('RESET_BUYING_LIST');
+  },
+  resetGetted({ commit }) {
+    commit('RESET_GETTED');
   },
 };
