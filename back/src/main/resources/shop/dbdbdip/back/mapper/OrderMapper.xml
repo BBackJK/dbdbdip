@@ -61,7 +61,8 @@
 			orders
 		JOIN product AS p
 		ON p.id = orders.product_id
-		WHERE orders.user_id = #{userId}
+		WHERE orders.user_id = #{userId} and orders.deletedAt is null 
+		ORDER BY orders.createdAt DESC
 	</select>
 	<select id="selectByDate" parameterType="OrderGetByDateModel" resultMap="OrderResultMap">
 		SELECT
@@ -71,5 +72,6 @@
 		JOIN product AS p
 		ON p.id = orders.product_id
 		WHERE orders.user_id = #{userId} and orders.createdAt LIKE CONCAT(#{searchDate}, '%')
+		
 	</select>
 </mapper>
