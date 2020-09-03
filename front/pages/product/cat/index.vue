@@ -5,29 +5,24 @@
         <v-card class="mx-auto" max-width="400">
           <div @click="onProductDetail(item)">
             <v-img
-              class="white--text align-end"
+              class="align-end"
               height="200px"
               :src="item.imagePath"
             ></v-img>
 
             <v-card-title class="pb-0">{{ item.name }}</v-card-title>
-            <v-card-text class="text--primary">
-              <div class="item-price">{{ item.price }} won</div>
-
-              <br />
+            <br />
+            <v-card-text>
+              <div class="float-right">{{ item.price }} won</div>
             </v-card-text>
           </div>
+          <br />
           <v-card-actions>
-            <v-row no-gutters>
-              <v-col v-if="userInfo" cols="3">
-                <v-btn color="orange" text @click="onUserCart(item)"
-                  >Cart</v-btn
-                >
-              </v-col>
-              <v-col v-else cols="3">
-                <v-btn color="orange" text @click="onCart(item)">Cart</v-btn>
-              </v-col>
-            </v-row>
+            <v-spacer></v-spacer>
+            <v-btn v-if="userInfo" color="orange" text @click="onUserCart(item)"
+              >Cart</v-btn
+            >
+            <v-btn v-else color="orange" text @click="onCart(item)">Cart</v-btn>
           </v-card-actions>
         </v-card>
         <Snackbar v-if="snackbar" :title="title" :snackbar-flag="snackbar" />

@@ -30,6 +30,7 @@
         </span>
       </v-card-text>
       <v-card-actions>
+        <v-spacer></v-spacer>
         <v-btn color="orange" text class="mr-14" @click="onOrder(selectItem)"
           >Order</v-btn
         >
@@ -152,14 +153,17 @@ export default {
       }, 5000);
     },
     onOrder(item) {
-      const orderItem = [];
-      item.orderQuantity = this.orderQuantity;
+      const data = [
+        {
+          orderQuantity: this.orderQuantity,
+          product: item,
+        },
+      ];
 
-      const totalPrice = item.orderQuantity * item.price * 1;
-      orderItem.push(item);
+      const totalPrice = this.orderQuantity * item.price * 1;
 
       this.$store.dispatch('order/updateTotalPrice', totalPrice);
-      this.$store.dispatch('order/pushOrderData', orderItem);
+      this.$store.dispatch('order/pushOrderData', data);
       this.$router.push('/order');
     },
     onUpQuantity() {

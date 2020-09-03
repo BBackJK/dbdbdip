@@ -22,7 +22,8 @@
         </span>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="orange" text class="mr-14" @click="onOrder(selectItem)">
+        <v-spacer></v-spacer>
+        <v-btn color="orange" text @click="onOrder(selectItem)">
           Order
         </v-btn>
         <v-btn
@@ -35,7 +36,6 @@
         <v-btn v-else color="orange" text @click="onCart(selectItem)">
           Cart
         </v-btn>
-
         <v-spacer></v-spacer>
       </v-card-actions>
       <v-btn icon @click="show = !show">
